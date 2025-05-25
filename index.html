@@ -206,6 +206,7 @@
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     animation: fadeInUp 0.4s ease;
     aspect-ratio: 1 / 1;
+    position: relative;
   }
   .card:hover {
     transform: scale(1.04);
@@ -216,6 +217,26 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+  }
+  .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .card:hover .delete-btn {
+    opacity: 1;
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.95); }
@@ -725,7 +746,7 @@
   const welcomeSection = document.getElementById('welcomeSection');
   const converterSection = document.getElementById('converterSection');
   const logo = document.querySelector('.logo');
- const uploadProgress = document.getElementById('uploadProgress');
+  const uploadProgress = document.getElementById('uploadProgress');
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -895,11 +916,29 @@
 
     let processedImages = 0;
     const totalFiles = files.length;
+    let validFiles = 0;
     uploadProgress.style.display = 'block';
     uploadProgress.textContent = `Uploading 0/${totalFiles} images...`;
 
     const newImages = [];
     files.forEach((file) => {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        showMessage(`File "${file.name}" exceeds 5MB limit and will be skipped.`);
+        processedImages++;
+        uploadProgress.textContent = `Uploading ${processedImages}/${totalFiles} images...`;
+        if (processedImages === totalFiles) {
+          uploadProgress.style.display = 'none';
+          if (validFiles > 0) {
+            showMessage(`${validFiles} image${validFiles > 1 ? 's' : ''} uploaded successfully!`);
+          } else {
+            showMessage('No valid images uploaded.');
+          }
+        }
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const imageUrl = event.target.result;
@@ -908,6 +947,7 @@
         // Add to gallery and temporary array
         addImageToGallery(imageUrl, fileName);
         newImages.push({ url: imageUrl, name: fileName });
+        validFiles++;
 
         processedImages++;
         uploadProgress.textContent = `Uploading ${processedImages}/${totalFiles} images...`;
@@ -920,7 +960,7 @@
           try {
             localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
             uploadProgress.style.display = 'none';
-            showMessage(`${totalFiles} image${totalFiles > 1 ? 's' : ''} uploaded successfully!`);
+            showMessage(`${validFiles} image${validFiles > 1 ? 's' : ''} uploaded successfully!`);
           } catch (e) {
             uploadProgress.style.display = 'none';
             showMessage('Storage limit reached. Only some images were saved. Please remove some images or reduce their size.');
@@ -962,6 +1002,24 @@
     const img = document.createElement('img');
     img.src = imageUrl;
     img.alt = 'Uploaded image';
+
+    // Add delete button for admins
+    if (isAdmin) {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.classList.add('delete-btn');
+      deleteBtn.textContent = '×';
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent triggering the preview modal
+        const index = uploadedImages.findIndex(img => img.url === imageUrl);
+        if (index !== -1) {
+          uploadedImages.splice(index, 1);
+          localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+          card.remove();
+          showMessage('Image deleted successfully.');
+        }
+      });
+      card.appendChild(deleteBtn);
+    }
 
     card.appendChild(img);
     gallery.appendChild(card);
@@ -1069,6 +1127,13 @@
     updateMenuVisibility();
     signupLoginModal.classList.remove('show');
     showMessage('Login successful!');
+    // Refresh gallery to hide delete buttons for non-admins
+    if (gallery.style.display === 'grid') {
+      gallery.innerHTML = '';
+      uploadedImages.forEach(image => {
+        addImageToGallery(image.url, image.name);
+      });
+    }
   });
 
   adminSubmitBtn.addEventListener('click', () => {
@@ -1080,6 +1145,13 @@
       updateMenuVisibility();
       signupLoginModal.classList.remove('show');
       showMessage('Welcome Admin!');
+      // Refresh gallery to show delete buttons for admins
+      if (gallery.style.display === 'grid') {
+        gallery.innerHTML = '';
+        uploadedImages.forEach(image => {
+          addImageToGallery(image.url, image.name);
+        });
+      }
     } else {
       showMessage('Access denied: Invalid admin code.');
     }
@@ -1105,6 +1177,13 @@
     }
     showSection('home');
     showMessage('Disconnected successfully.');
+    // Refresh gallery to hide delete buttons after disconnect
+    if (gallery.style.display === 'grid') {
+      gallery.innerHTML = '';
+      uploadedImages.forEach(image => {
+        addImageToGallery(image.url, image.name);
+      });
+    }
   });
 
   disconnectCancelBtn.addEventListener('click', () => {
