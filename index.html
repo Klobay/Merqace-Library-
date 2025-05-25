@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Merqace Library</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0f0f0f;
+    color: white;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    backdrop-filter: blur(16px);
+    background: rgba(20, 20, 20, 0.5);
+    z-index: 1000;
+  }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: opacity 0.3s ease;
+  }
+  .logo.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  #signupLoginBtn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: none;
+  }
+  #uploadBtnHeader {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: 10px;
+    display: none;
+    transition: opacity 0.3s ease;
+  }
+  #uploadBtnHeader:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  #hamburgerBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1100;
+  }
+  #hamburgerBtn span {
+    width: 24px;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+  #hamburgerBtn.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  #hamburgerBtn.active span:nth-child(2) {
+    opacity: 0;
+  }
+  #hamburgerBtn.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+  .menu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(20px);
+    padding: 15px;
+    border-radius: 12px;
+    animation: fadeIn 0.3s ease;
+    min-width: 160px;
+    z-index: 1050;
+  }
+  .menu.show {
+    display: flex;
+  }
+  .menu a, .menu button {
+    color: white;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: left;
+  }
+  .menu a:hover, .menu button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  #welcomeSection, #converterSection {
+    text-align: center;
+    padding: 40px 20px;
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInUp 1s ease;
+    position: relative;
+    z-index: 1;
+  }
+  #welcomeMessage {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+  #description {
+    font-size: 1.2rem;
+    color: #ccc;
+    display: inline-block;
+  }
+  .cursor {
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: white;
+    vertical-align: middle;
+    animation: blink 0.7s infinite;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  .dot {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: moveDot 5s infinite ease-in-out;
+  }
+  @keyframes moveDot {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: translate(var(--x-move), var(--y-move)) scale(1.5);
+      opacity: 0.3;
+    }
+    100% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.7;
+    }
+  }
+  main.gallery {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    flex: 1;
+    min-height: 60vh; /* Ensure gallery takes up space */
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: fadeInUp 0.4s ease;
+    aspect-ratio: 1 / 1;
+  }
+  .card:hover {
+    transform: scale(1.04);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  #previewModal, #signupLoginModal, #messageModal, #disconnectModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+  }
+  #previewModal.show, #signupLoginModal.show, #messageModal.show, #disconnectModal.show {
+    display: flex;
+  }
+  #previewImage {
+    max-width: 90%;
+    max-height: 85%;
+    border-radius: 12px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+  }
+  #previewDownload {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 250, 0.1);
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85em;
+  }
+  #signupLoginModalContent, #messageModalContent, #disconnectModalContent {
+    background: rgba(20, 20, 20, 0.85);
+    padding: 20px 25px 30px 25px;
+    border-radius: 12px;
+    max-width: 320px;
+    width: 90%;
+    color: white;
+    box-shadow: 0 0 40px rgba(0,0,0,0.9);
+    text-align: center;
+  }
+  #signupLoginModalContent h2, #messageModalContent h2, #disconnectModalContent h2 {
+    margin-bottom: 15px;
+  }
+  #signupUsername, #signupPassword, #loginUsername, #loginPassword, #adminPassword {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 15px;
+    background: #222;
+    color: white;
+  }
+  #signupLoginButtons, #messageButtons, #disconnectButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  #messageButtons, #disconnectButtons {
+    margin-top: 15px;
+  }
+  button.modalBtn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-width: 70px;
+  }
+  button.modalBtn:hover, button.modalBtn:focus {
+    background: white;
+    color: black;
+    outline: none;
+  }
+  button.modalBtn:active {
+    background: white;
+    color: black;
+  }
+  #signupLoginTabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+  }
+  .tabBtn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+  }
+  .tabBtn.active {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .tabBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .tabContent {
+    display: none;
+  }
+  .tabContent.active {
+    display: block;
+  }
+  footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.8em;
+    color: #777;
+    width: 100%;
+  }
+  #fileInput {
+    display: none;
+  }
+
+  .converter-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    z-index: 1;
+  }
+  .converter-container h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    animation: fadeInUp 1s ease;
+  }
+  .instructions {
+    text-align: center;
+    margin: 0 15px 15px;
+    font-size: 1rem;
+    color: #ccc;
+    max-width: 450px;
+    animation: fadeInUp 1s ease;
+  }
+  .textarea-container {
+    position: relative;
+    margin-bottom: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  textarea, #outputText {
+    width: 100%;
+    min-height: 90px;
+    padding: 8px;
+    font-size: 0.9em;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    color: white;
+    resize: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: fadeInUp 0.4s ease;
+    text-align: center;
+  }
+  #outputText {
+    word-wrap: break-word;
+  }
+  .clear-button {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    padding: 4px;
+    font-size: 0.8em;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+    opacity: 0.7;
+    backdrop-filter: blur(10px);
+  }
+  .clear-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    opacity: 1;
+  }
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  .button-container button {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    max-width: 180px;
+    backdrop-filter: blur(10px);
+    text-align: center;
+  }
+  .button-container button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: black;
+    transform: scale(1.05);
+  }
+  .converter-container h2 {
+    margin-top: 15px;
+    text-align: center;
+    width: 100%;
+    max-width: 450px;
+    font-size: 1.2rem;
+    animation: fadeInUp 0.4s ease;
+  }
+
+  /* Mobile Responsive Design */
+  @media (max-width: 768px) {
+    header {
+      padding: 10px 15px;
+    }
+    #signupLoginBtn, #uploadBtnHeader {
+      padding: 6px 10px;
+      font-size: 0.8em;
+    }
+    #hamburgerBtn {
+      margin-left: 5px;
+    }
+    #hamburgerBtn span {
+      width: 20px;
+      height: 2.5px;
+    }
+    .menu {
+      top: 50px;
+      right: 15px;
+      padding: 10px;
+      min-width: 140px;
+    }
+    .menu a, .menu button {
+      padding: 8px 10px;
+      font-size: 0.9em;
+    }
+    #welcomeSection, #converterSection {
+      padding: 20px 10px;
+    }
+    #welcomeMessage {
+      font-size: 1.8rem;
+    }
+    #description {
+      font-size: 1rem;
+    }
+    main.gallery {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      padding: 10px;
+    }
+    .card {
+      border-radius: 8px;
+    }
+    #previewImage {
+      max-width: 95%;
+      max-height: 80%;
+      border-radius: 10px;
+    }
+    #previewDownload {
+      top: 15px;
+      left: 15px;
+      padding: 6px 10px;
+      font-size: 0.75em;
+    }
+    #signupLoginModalContent, #messageModalContent, #disconnectModalContent {
+      padding: 15px 20px 25px 20px;
+      max-width: 280px;
+    }
+    #signupLoginTabs {
+      margin-bottom: 10px;
+    }
+    .tabBtn {
+      padding: 4px 10px;
+      font-size: 0.8em;
+    }
+    #signupUsername, #signupPassword, #loginUsername, #loginPassword, #adminPassword {
+      padding: 6px 8px;
+      font-size: 0.8em;
+      margin-bottom: 10px;
+    }
+    button.modalBtn {
+      padding: 4px 12px;
+      font-size: 0.8em;
+      min-width: 60px;
+    }
+    .converter-container {
+      max-width: 400px;
+    }
+    .converter-container h1 {
+      font-size: 1.5rem;
+    }
+    .instructions {
+      font-size: 0.9em;
+      max-width: 350px;
+    }
+    textarea, #outputText {
+      min-height: 80px;
+      padding: 6px;
+      font-size: 0.8em;
+    }
+    .clear-button {
+      right: 6px;
+      top: 6px;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7em;
+    }
+    .button-container button {
+      padding: 6px 12px;
+      font-size: 0.8em;
+      max-width: 150px;
+    }
+    .converter-container h2 {
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+    footer {
+      padding: 8px;
+      font-size: 0.7em;
+    }
+  }
+
+  /* Desktop-Specific Adjustments */
+  @media (min-width: 769px) {
+    main.gallery {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Larger cards on desktop */
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      border-radius: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">Merqace Library</div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button id="uploadBtnHeader">Upload</button>
+      <button id="signupLoginBtn">Sign Up/Login</button>
+      <button id="hamburgerBtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+    <nav class="menu" id="menu">
+      <a href="#" id="homeBtn">Home</a>
+      <button id="signupLoginMenuBtn">Sign Up/Login</button>
+      <a href="#" id="wallpapersBtn" style="display: none;">Wallpapers</a>
+      <a href="#" id="converterBtn" style="display: none;">Numora Converter</a>
+      <button id="disconnectBtn" style="display: none;">Disconnect</button>
+    </nav>
+  </header>
+
+  <section id="welcomeSection">
+    <div id="welcomeMessage"></div>
+    <div id="description"></div>
+  </section>
+
+  <main class="gallery" id="gallery">
+    <!-- Images will be added dynamically -->
+  </main>
+
+  <section id="converterSection">
+    <div class="converter-container">
+      <h1>Numora Converter</h1>
+      <p class="instructions">
+        Convert text between the alphabet and Numora in real-time! Simply type in the box below, and the conversion will happen automatically. Use the buttons to switch conversion modes or copy the result.
+      </p>
+      <div class="textarea-container">
+        <textarea id="inputText" rows="4" placeholder="Enter text here..."></textarea>
+        <button class="clear-button" onclick="clearText()">×</button>
+      </div>
+      <div class="button-container">
+        <button onclick="toggleConversion()" id="toggleButton">Alphabet → Numora</button>
+        <button onclick="copyOutput()">Copy Converted Text</button>
+      </div>
+      <h2>Converted Text:</h2>
+      <p id="outputText"></p>
+    </div>
+  </section>
+
+  <input type="file" id="fileInput" accept="image/*" multiple />
+
+  <div id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewLabel">
+    <a id="previewDownload" download target="_blank" aria-label="Download image">Download</a>
+    <img id="previewImage" src="" alt="Wallpaper preview" />
+  </div>
+
+  <div id="signupLoginModal" role="dialog" aria-modal="true" aria-labelledby="signupLoginTitle" tabindex="-1">
+    <div id="signupLoginModalContent">
+      <h2 id="signupLoginTitle">Sign Up or Login</h2>
+      <div id="signupLoginTabs">
+        <button class="tabBtn active" id="signupTabBtn" onclick="showTab('signup')">Sign Up</button>
+        <button class="tabBtn" id="loginTabBtn" onclick="showTab('login')">Login</button>
+        <button class="tabBtn" id="adminTabBtn" onclick="showTab('admin')">Admin</button>
+      </div>
+      <div id="signupTab" class="tabContent active">
+        <input type="text" id="signupUsername" placeholder="Username" aria-describedby="signupDesc" />
+        <input type="password" id="signupPassword" placeholder="Password" />
+        <div id="signupLoginButtons">
+          <button class="modalBtn" id="signupSubmitBtn">Sign Up</button>
+          <button class="modalBtn" id="signupLoginCloseBtn">Close</button>
+        </div>
+      </div>
+      <div id="loginTab" class="tabContent">
+        <input type="text" id="loginUsername" placeholder="Username" aria-describedby="loginDesc" />
+        <input type="password" id="loginPassword" placeholder="Password" />
+        <div id="signupLoginButtons">
+          <button class="modalBtn" id="loginSubmitBtn">Login</button>
+          <button class="modalBtn" id="signupLoginCloseBtn">Close</button>
+        </div>
+      </div>
+      <div id="adminTab" class="tabContent">
+        <input type="password" id="adminPassword" placeholder="Enter admin code" aria-describedby="adminDesc" />
+        <div id="signupLoginButtons">
+          <button class="modalBtn" id="adminSubmitBtn">Submit</button>
+          <button class="modalBtn" id="signupLoginCloseBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="messageModal" role="alertdialog" aria-modal="true" aria-labelledby="messageTitle" tabindex="-1">
+    <div id="messageModalContent">
+      <h2 id="messageTitle"></h2>
+      <p id="messageText"></p>
+      <div id="messageButtons">
+        <button class="modalBtn" id="messageCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="disconnectModal" role="alertdialog" aria-modal="true" aria-labelledby="disconnectTitle" tabindex="-1">
+    <div id="disconnectModalContent">
+      <h2 id="disconnectTitle">Confirm Disconnect</h2>
+      <p id="disconnectText">Are you sure you want to disconnect?</p>
+      <div id="disconnectButtons">
+        <button class="modalBtn" id="disconnectConfirmBtn">Yes</button>
+        <button class="modalBtn" id="disconnectCancelBtn">No</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Merqace Library. All rights reserved.
+  </footer>
+
+<script>
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('menu');
+  const signupLoginBtn = document.getElementById('signupLoginBtn');
+  const signupLoginMenuBtn = document.getElementById('signupLoginMenuBtn');
+  const uploadBtnHeader = document.getElementById('uploadBtnHeader');
+  const signupLoginModal = document.getElementById('signupLoginModal');
+  const signupLoginCloseBtn = document.querySelectorAll('#signupLoginCloseBtn');
+  const signupSubmitBtn = document.getElementById('signupSubmitBtn');
+  const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+  const adminSubmitBtn = document.getElementById('adminSubmitBtn');
+  const signupUsername = document.getElementById('signupUsername');
+  const signupPassword = document.getElementById('signupPassword');
+  const loginUsername = document.getElementById('loginUsername');
+  const loginPassword = document.getElementById('loginPassword');
+  const adminPassword = document.getElementById('adminPassword');
+  const messageModal = document.getElementById('messageModal');
+  const messageText = document.getElementById('messageText');
+  const messageCloseBtn = document.getElementById('messageCloseBtn');
+  const disconnectBtn = document.getElementById('disconnectBtn');
+  const disconnectModal = document.getElementById('disconnectModal');
+  const disconnectConfirmBtn = document.getElementById('disconnectConfirmBtn');
+  const disconnectCancelBtn = document.getElementById('disconnectCancelBtn');
+  const homeBtn = document.getElementById('homeBtn');
+  const wallpapersBtn = document.getElementById('wallpapersBtn');
+  const converterBtn = document.getElementById('converterBtn');
+  const previewModal = document.getElementById('previewModal');
+  const previewImage = document.getElementById('previewImage');
+  const previewDownload = document.getElementById('previewDownload');
+  const gallery = document.getElementById('gallery');
+  const fileInput = document.getElementById('fileInput');
+  const welcomeMessage = document.getElementById('welcomeMessage');
+  const description = document.getElementById('description');
+  const welcomeSection = document.getElementById('welcomeSection');
+  const converterSection = document.getElementById('converterSection');
+  const logo = document.querySelector('.logo');
+
+  let isLoggedIn = false;
+  let isAdmin = false;
+  let uploadedImages = [];
+
+    // Load state from localStorage on page load
+  window.onload = () => {
+    previewModal.classList.remove('show');
+    signupLoginModal.classList.remove('show');
+    messageModal.classList.remove('show');
+    disconnectModal.classList.remove('show');
+    welcomeSection.style.display = 'flex';
+    gallery.style.display = 'none';
+    converterSection.style.display = 'none';
+    signupLoginBtn.style.display = 'block';
+    uploadBtnHeader.style.display = 'none';
+    logo.classList.add('hidden'); // Hide logo on homepage
+
+    // Restore login state
+    isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    isAdmin = localStorage.getItem('isAdmin') === 'true';
+    updateMenuVisibility();
+
+    // Restore uploaded images
+    const storedImages = localStorage.getItem('uploadedImages');
+    if (storedImages) {
+      uploadedImages = JSON.parse(storedImages);
+      gallery.innerHTML = ''; // Clear gallery before repopulating
+      uploadedImages.forEach(image => {
+        addImageToGallery(image.url, image.name);
+      });
+    }
+
+    typeWelcome();
+    createDots();
+  };
+
+  function updateMenuVisibility() {
+    if (isLoggedIn || isAdmin) {
+      signupLoginBtn.style.display = 'none';
+      signupLoginMenuBtn.style.display = 'none';
+      wallpapersBtn.style.display = 'block';
+      converterBtn.style.display = 'block';
+      disconnectBtn.style.display = 'block';
+    } else {
+      signupLoginBtn.style.display = 'block';
+      signupLoginMenuBtn.style.display = 'block';
+      wallpapersBtn.style.display = 'none';
+      converterBtn.style.display = 'none';
+      disconnectBtn.style.display = 'none';
+    }
+    if (welcomeSection.style.display === 'flex') {
+      logo.classList.add('hidden');
+    } else {
+      logo.classList.remove('hidden');
+    }
+  }
+
+  const welcomeText = "Welcome to Merqace Library!";
+  const descText = "This is my world!";
+  let i = 0;
+  let j = 0;
+
+  function typeWelcome() {
+    if (i < welcomeText.length) {
+      welcomeMessage.textContent = welcomeText.substring(0, i + 1);
+      welcomeMessage.innerHTML += '<span class="cursor"></span>';
+      i++;
+      setTimeout(typeWelcome, 100);
+    } else {
+      welcomeMessage.innerHTML = welcomeText;
+      setTimeout(typeDescription, 500);
+    }
+  }
+
+  function typeDescription() {
+    if (j < descText.length) {
+      description.textContent = descText.substring(0, j + 1);
+      description.innerHTML += '<span class="cursor"></span>';
+      j++;
+      setTimeout(typeDescription, 80);
+    } else {
+      description.innerHTML = descText;
+    }
+  }
+
+  function createDots() {
+    const numDots = 20;
+    for (let k = 0; k < numDots; k++) {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      const size = Math.random() * 8 + 2;
+      const xPos = Math.random() * 100;
+      const yPos = Math.random() * 100;
+      const xMove = (Math.random() - 0.5) * 100;
+      const yMove = (Math.random() - 0.5) * 100;
+      const delay = Math.random() * 5;
+      dot.style.width = `${size}px`;
+      dot.style.height = `${size}px`;
+      dot.style.left = `${xPos}%`;
+      dot.style.top = `${yPos}%`;
+      dot.style.setProperty('--x-move', `${xMove}px`);
+      dot.style.setProperty('--y-move', `${yMove}px`);
+      dot.style.animationDelay = `${delay}s`;
+      welcomeSection.appendChild(dot);
+    }
+  }
+
+  hamburgerBtn.addEventListener('click', () => {
+    const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true' || false;
+    hamburgerBtn.setAttribute('aria-expanded', !expanded);
+    hamburgerBtn.classList.toggle('active');
+    menu.classList.toggle('show');
+  });
+
+  [homeBtn, wallpapersBtn, converterBtn].forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+      hamburgerBtn.classList.remove('active');
+      menu.classList.remove('show');
+
+      if (btn.textContent === "Home") {
+        welcomeSection.style.display = 'flex';
+        gallery.style.display = 'none';
+        converterSection.style.display = 'none';
+        signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
+        uploadBtnHeader.style.display = 'none';
+        logo.classList.add('hidden');
+      } else if (btn.textContent === "Wallpapers") {
+        if (!isLoggedIn && !isAdmin) {
+          showMessage('Please sign up or log in to access Wallpapers.');
+          return;
+        }
+        welcomeSection.style.display = 'none';
+        gallery.style.display = 'grid';
+        converterSection.style.display = 'none';
+        signupLoginBtn.style.display = 'none';
+        uploadBtnHeader.style.display = 'block';
+        logo.classList.remove('hidden');
+      } else if (btn.textContent === "Numora Converter") {
+        if (!isLoggedIn && !isAdmin) {
+          showMessage('Please sign up or log in to access Numora Converter.');
+          return;
+        }
+        welcomeSection.style.display = 'none';
+        gallery.style.display = 'none';
+        converterSection.style.display = 'flex';
+        signupLoginBtn.style.display = 'none';
+        uploadBtnHeader.style.display = 'none';
+        logo.classList.remove('hidden');
+      }
+    });
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      let uploadedCount = 0;
+
+      files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const imageUrl = event.target.result;
+
+          addImageToGallery(imageUrl, file.name);
+          uploadedImages.push({ url: imageUrl, name: file.name });
+          localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+
+          uploadedCount++;
+          if (uploadedCount === files.length) {
+            showMessage(`${files.length} image${files.length > 1 ? 's' : ''} uploaded successfully!`);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    fileInput.value = '';
+  });
+
+  function addImageToGallery(imageUrl, fileName) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.alt = 'Uploaded image';
+
+    card.appendChild(img);
+    gallery.appendChild(card);
+
+    card.addEventListener('click', () => {
+      previewImage.src = imageUrl;
+      previewDownload.href = imageUrl;
+      previewDownload.download = fileName;
+      previewModal.classList.add('show');
+      signupLoginBtn.style.display = 'none';
+      uploadBtnHeader.style.display = 'none';
+      logo.classList.remove('hidden');
+    });
+  }
+
+  uploadBtnHeader.addEventListener('click', () => {
+    if (isAdmin) {
+      fileInput.click();
+    } else {
+      showMessage('Only admin is allowed to upload');
+    }
+  });
+
+  signupLoginBtn.addEventListener('click', openSignupLoginModal);
+  signupLoginMenuBtn.addEventListener('click', openSignupLoginModal);
+
+  function openSignupLoginModal() {
+    signupLoginModal.classList.add('show');
+    showTab('signup');
+    signupUsername.value = '';
+    signupPassword.value = '';
+    loginUsername.value = '';
+    loginPassword.value = '';
+    adminPassword.value = '';
+    signupUsername.focus();
+    signupLoginBtn.style.display = 'none';
+    uploadBtnHeader.style.display = 'none';
+    logo.classList.remove('hidden');
+  }
+
+  signupLoginCloseBtn.forEach(button => {
+    button.addEventListener('click', () => {
+      signupLoginModal.classList.remove('show');
+      if (welcomeSection.style.display === 'flex') {
+        signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
+        logo.classList.add('hidden');
+      }
+      if (gallery.style.display === 'grid') {
+        uploadBtnHeader.style.display = 'block';
+      }
+    });
+  });
+
+  function showTab(tabName) {
+    document.querySelectorAll('.tabContent').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tabBtn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`${tabName}Tab`).classList.add('active');
+    document.getElementById(`${tabName}TabBtn`).classList.add('active');
+    if (tabName === 'signup') signupUsername.focus();
+    if (tabName === 'login') loginUsername.focus();
+    if (tabName === 'admin') adminPassword.focus();
+  }
+
+  signupSubmitBtn.addEventListener('click', () => {
+    const username = signupUsername.value.trim();
+    const password = signupPassword.value.trim();
+    if (!username || !password) {
+      showMessage('Please enter both username and password.');
+      return;
+    }
+
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    if (users.some(user => user.username === username)) {
+      showMessage('Username already exists. Please choose another.');
+      return;
+    }
+
+    users.push({ username, password });
+    localStorage.setItem('users', JSON.stringify(users));
+    showMessage('Sign up successful! Please log in.');
+    showTab('login');
+    signupUsername.value = '';
+    signupPassword.value = '';
+  });
+
+  loginSubmitBtn.addEventListener('click', () => {
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value.trim();
+    if (!username || !password) {
+      showMessage('Please enter both username and password.');
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(user => user.username === username && user.password === password);
+    if (!user) {
+      showMessage('Invalid username or password.');
+      return;
+    }
+
+    isLoggedIn = true;
+    isAdmin = false;
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('isAdmin', 'false');
+    updateMenuVisibility();
+    signupLoginModal.classList.remove('show');
+    showMessage('Login successful!');
+  });
+
+  adminSubmitBtn.addEventListener('click', () => {
+    if (adminPassword.value === 'b3d5ec73f3b82d3db73f') {
+      isLoggedIn = true;
+      isAdmin = true;
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('isAdmin', 'true');
+      updateMenuVisibility();
+      signupLoginModal.classList.remove('show');
+      showMessage('Welcome Admin!');
+    } else {
+      showMessage('Access denied: Invalid admin code.');
+    }
+  });
+
+  disconnectBtn.addEventListener('click', () => {
+    disconnectModal.classList.add('show');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    hamburgerBtn.classList.remove('active');
+    menu.classList.remove('show');
+  });
+
+  disconnectConfirmBtn.addEventListener('click', () => {
+    isLoggedIn = false;
+    isAdmin = false;
+    localStorage.setItem('isLoggedIn', 'false');
+    localStorage.setItem('isAdmin', 'false');
+    disconnectBtn.style.display = 'none';
+    disconnectModal.classList.remove('show');
+    updateMenuVisibility();
+    if (welcomeSection.style.display === 'flex') {
+      signupLoginBtn.style.display = 'block';
+    }
+    showMessage('Disconnected successfully.');
+  });
+
+  disconnectCancelBtn.addEventListener('click', () => {
+    disconnectModal.classList.remove('show');
+  });
+
+  messageCloseBtn.addEventListener('click', () => {
+    messageModal.classList.remove('show');
+  });
+
+  function showMessage(text) {
+    messageText.textContent = text;
+    messageModal.classList.add('show');
+    setTimeout(() => {
+      messageModal.classList.remove('show');
+    }, 3000);
+  }
+
+  [signupLoginModal, messageModal, previewModal, disconnectModal].forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+        if (welcomeSection.style.display === 'flex') {
+          signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
+          logo.classList.add('hidden');
+        }
+        if (gallery.style.display === 'grid') {
+          uploadBtnHeader.style.display = 'block';
+        }
+      }
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      [signupLoginModal, messageModal, previewModal, disconnectModal].forEach(modal => {
+        modal.classList.remove('show');
+      });
+      if (menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        hamburgerBtn.classList.remove('active');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      }
+      if (welcomeSection.style.display === 'flex') {
+        signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
+        logo.classList.add('hidden');
+      }
+      if (gallery.style.display === 'grid') {
+        uploadBtnHeader.style.display = 'block';
+      }
+    }
+  });
+
+  const symbolMap = {
+    'A': '∣', 'B': '‒', 'C': 'ˁ', 'D': '●', 'E': '⋋', 'F': '⋌', 'G': '≺', 'H': '⋏', 'I': '≖', 'J': '≻',
+    'K': '⊼', 'L': '∦', 'M': '⋂', 'N': '⋃', 'O': '∅', 'P': '∸', 'Q': '∀', 'R': '∈', 'S': '∼', 'T': 'T',
+    'U': '∃', 'V': '⋎', 'W': 'w', 'X': 'X', 'Y': 'Y', 'Z': 'Ω'
+  };
+
+  const reverseSymbolMap = {};
+  for (const [key, value] of Object.entries(symbolMap)) {
+    reverseSymbolMap[value] = key;
+  }
+  reverseSymbolMap['ω'] = 'W';
+  reverseSymbolMap['Ω'] = 'Z';
+
+  let conversionType = 'alphabetToSymbol';
+
+  function toggleConversion() {
+    conversionType = conversionType === 'alphabetToSymbol' ? 'symbolToAlphabet' : 'alphabetToSymbol';
+    const toggleButton = document.getElementById('toggleButton');
+    toggleButton.textContent = conversionType === 'alphabetToSymbol' 
+      ? 'Alphabet → Numora' 
+      : 'Numora → Alphabet';
+    convertText();
+  }
+
+  function convertText() {
+    const inputText = document.getElementById('inputText').value.toUpperCase();
+    let outputText = '';
+
+    if (conversionType === 'alphabetToSymbol') {
+      for (let char of inputText) {
+        const symbol = symbolMap[char] || char;
+        outputText += symbol;
+      }
+    } else {
+      for (let char of inputText) {
+        const letter = reverseSymbolMap[char] || char;
+        outputText += letter;
+      }
+    }
+
+    document.getElementById('outputText').innerText = outputText;
+  }
+
+  function copyOutput() {
+    const outputText = document.getElementById('outputText').innerText;
+    if (outputText) {
+      navigator.clipboard.writeText(outputText).then(() => {
+        showMessage('Converted text copied to clipboard!');
+      }).catch(() => {
+        showMessage('Failed to copy text.');
+      });
+    } else {
+      showMessage('No converted text to copy.');
+    }
+  }
+
+  function clearText() {
+    document.getElementById('inputText').value = '';
+    document.getElementById('outputText').innerText = '';
+  }
+
+  document.getElementById('inputText').addEventListener('input', convertText);
+</script>
+</body>
+</html>
