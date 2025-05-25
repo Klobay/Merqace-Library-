@@ -65,6 +65,18 @@
   #uploadBtnHeader:hover {
     background: rgba(255, 255, 255, 0.3);
   }
+  #uploadProgress {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    display: none;
+    z-index: 1000;
+  }
   #hamburgerBtn {
     background: none;
     border: none;
@@ -581,6 +593,8 @@
     </nav>
   </header>
 
+  <div id="uploadProgress"></div>
+
   <section id="welcomeSection">
     <div id="welcomeMessage"></div>
     <div id="description"></div>
@@ -711,6 +725,8 @@
   const welcomeSection = document.getElementById('welcomeSection');
   const converterSection = document.getElementById('converterSection');
   const logo = document.querySelector('.logo');
+  const uploadProgress = document.getEl
+ const uploadProgress = document.getElementById('uploadProgress');
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -722,31 +738,67 @@
     signupLoginModal.classList.remove('show');
     messageModal.classList.remove('show');
     disconnectModal.classList.remove('show');
-    welcomeSection.style.display = 'flex';
-    gallery.style.display = 'none';
-    converterSection.style.display = 'none';
-    signupLoginBtn.style.display = 'block';
-    uploadBtnHeader.style.display = 'none';
-    logo.classList.add('hidden'); // Hide logo on homepage
 
     // Restore login state
     isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     isAdmin = localStorage.getItem('isAdmin') === 'true';
-    updateMenuVisibility();
+
+    // Restore last viewed section
+    const lastSection = localStorage.getItem('currentSection') || 'home';
+    showSection(lastSection);
 
     // Restore uploaded images
     const storedImages = localStorage.getItem('uploadedImages');
     if (storedImages) {
-      uploadedImages = JSON.parse(storedImages);
-      gallery.innerHTML = ''; // Clear gallery before repopulating
-      uploadedImages.forEach(image => {
-        addImageToGallery(image.url, image.name);
-      });
+      try {
+        uploadedImages = JSON.parse(storedImages);
+        gallery.innerHTML = '';
+        uploadedImages.forEach(image => {
+          addImageToGallery(image.url, image.name);
+        });
+      } catch (e) {
+        showMessage('Error loading images from storage. Storage may be corrupted.');
+        localStorage.removeItem('uploadedImages');
+        uploadedImages = [];
+      }
     }
 
+    updateMenuVisibility();
     typeWelcome();
     createDots();
   };
+
+  function showSection(section) {
+    welcomeSection.style.display = 'none';
+    gallery.style.display = 'none';
+    converterSection.style.display = 'none';
+    signupLoginBtn.style.display = 'none';
+    uploadBtnHeader.style.display = 'none';
+
+    if (section === 'home') {
+      welcomeSection.style.display = 'flex';
+      signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
+      logo.classList.add('hidden');
+    } else if (section === 'wallpapers') {
+      if (!isLoggedIn && !isAdmin) {
+        showMessage('Please sign up or log in to access Wallpapers.');
+        showSection('home');
+        return;
+      }
+      gallery.style.display = 'grid';
+      uploadBtnHeader.style.display = 'block';
+      logo.classList.remove('hidden');
+    } else if (section === 'converter') {
+      if (!isLoggedIn && !isAdmin) {
+        showMessage('Please sign up or log in to access Numora Converter.');
+        showSection('home');
+        return;
+      }
+      converterSection.style.display = 'flex';
+      logo.classList.remove('hidden');
+    }
+    localStorage.setItem('currentSection', section);
+  }
 
   function updateMenuVisibility() {
     if (isLoggedIn || isAdmin) {
@@ -761,11 +813,6 @@
       wallpapersBtn.style.display = 'none';
       converterBtn.style.display = 'none';
       disconnectBtn.style.display = 'none';
-    }
-    if (welcomeSection.style.display === 'flex') {
-      logo.classList.add('hidden');
-    } else {
-      logo.classList.remove('hidden');
     }
   }
 
@@ -834,60 +881,78 @@
       menu.classList.remove('show');
 
       if (btn.textContent === "Home") {
-        welcomeSection.style.display = 'flex';
-        gallery.style.display = 'none';
-        converterSection.style.display = 'none';
-        signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
-        uploadBtnHeader.style.display = 'none';
-        logo.classList.add('hidden');
+        showSection('home');
       } else if (btn.textContent === "Wallpapers") {
-        if (!isLoggedIn && !isAdmin) {
-          showMessage('Please sign up or log in to access Wallpapers.');
-          return;
-        }
-        welcomeSection.style.display = 'none';
-        gallery.style.display = 'grid';
-        converterSection.style.display = 'none';
-        signupLoginBtn.style.display = 'none';
-        uploadBtnHeader.style.display = 'block';
-        logo.classList.remove('hidden');
+        showSection('wallpapers');
       } else if (btn.textContent === "Numora Converter") {
-        if (!isLoggedIn && !isAdmin) {
-          showMessage('Please sign up or log in to access Numora Converter.');
-          return;
-        }
-        welcomeSection.style.display = 'none';
-        gallery.style.display = 'none';
-        converterSection.style.display = 'flex';
-        signupLoginBtn.style.display = 'none';
-        uploadBtnHeader.style.display = 'none';
-        logo.classList.remove('hidden');
+        showSection('converter');
       }
     });
   });
 
   fileInput.addEventListener('change', (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      let uploadedCount = 0;
+    if (files.length === 0) return;
 
-      files.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const imageUrl = event.target.result;
+    let processedImages = 0;
+    const totalFiles = files.length;
+    uploadProgress.style.display = 'block';
+    uploadProgress.textContent = `Uploading 0/${totalFiles} images...`;
 
-          addImageToGallery(imageUrl, file.name);
-          uploadedImages.push({ url: imageUrl, name: file.name });
-          localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+    const newImages = [];
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target.result;
+        const fileName = file.name;
 
-          uploadedCount++;
-          if (uploadedCount === files.length) {
-            showMessage(`${files.length} image${files.length > 1 ? 's' : ''} uploaded successfully!`);
+        // Add to gallery and temporary array
+        addImageToGallery(imageUrl, fileName);
+        newImages.push({ url: imageUrl, name: fileName });
+
+        processedImages++;
+        uploadProgress.textContent = `Uploading ${processedImages}/${totalFiles} images...`;
+
+        if (processedImages === totalFiles) {
+          // Append new images to uploadedImages
+          uploadedImages.push(...newImages);
+
+          // Save to localStorage
+          try {
+            localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+            uploadProgress.style.display = 'none';
+            showMessage(`${totalFiles} image${totalFiles > 1 ? 's' : ''} uploaded successfully!`);
+          } catch (e) {
+            uploadProgress.style.display = 'none';
+            showMessage('Storage limit reached. Only some images were saved. Please remove some images or reduce their size.');
+            // Remove excess images until storage fits
+            while (uploadedImages.length > 0) {
+              uploadedImages.pop();
+              try {
+                localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+                break;
+              } catch (e) {
+                continue;
+              }
+            }
+            gallery.innerHTML = '';
+            uploadedImages.forEach(image => {
+              addImageToGallery(image.url, image.name);
+            });
           }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
+        }
+      };
+      reader.onerror = () => {
+        processedImages++;
+        uploadProgress.textContent = `Uploading ${processedImages}/${totalFiles} images...`;
+        if (processedImages === totalFiles) {
+          uploadProgress.style.display = 'none';
+          showMessage('Some images failed to upload.');
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
     fileInput.value = '';
   });
 
@@ -1039,6 +1104,7 @@
     if (welcomeSection.style.display === 'flex') {
       signupLoginBtn.style.display = 'block';
     }
+    showSection('home');
     showMessage('Disconnected successfully.');
   });
 
