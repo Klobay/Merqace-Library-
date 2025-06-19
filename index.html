@@ -40,7 +40,7 @@
     opacity: 0;
     visibility: hidden;
   }
-  #signupLoginBtn {
+  #signupLoginBtn, #uploadBtnHeader {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
@@ -48,19 +48,7 @@
     border-radius: 10px;
     cursor: pointer;
     font-size: 0.9em;
-    display: none;
-  }
-  #uploadBtnHeader {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.9em;
-    margin-left: 10px;
-    display: none;
-    transition: opacity 0.3s ease;
+    transition: background 0.3s ease;
   }
   #uploadBtnHeader:hover {
     background: rgba(255, 255, 255, 0.3);
@@ -134,7 +122,7 @@
   .menu a:hover, .menu button:hover {
     background: rgba(255, 255, 255, 0.1);
   }
-  #welcomeSection, #converterSection {
+  #welcomeSection, #converterSection, #profileSection, #searchSection, #friendListSection {
     text-align: center;
     padding: 40px 20px;
     flex: 1;
@@ -146,16 +134,25 @@
     position: relative;
     z-index: 1;
   }
+  #chatSection {
+    text-align: center;
+    padding: 40px 20px;
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInUp 1s ease;
+    position: relative;
+    z-index: 1;
+  }
   #welcomeMessage {
     font-size: 2.5rem;
     font-weight: bold;
     margin-bottom: 10px;
-    display: inline-block;
   }
   #description {
     font-size: 1.2rem;
     color: #ccc;
-    display: inline-block;
   }
   .cursor {
     display: inline-block;
@@ -177,18 +174,9 @@
     animation: moveDot 5s infinite ease-in-out;
   }
   @keyframes moveDot {
-    0% {
-      transform: translate(0, 0) scale(1);
-      opacity: 0.7;
-    }
-    50% {
-      transform: translate(var(--x-move), var(--y-move)) scale(1.5);
-      opacity: 0.3;
-    }
-    100% {
-      transform: translate(0, 0) scale(1);
-      opacity: 0.7;
-    }
+    0% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+    50% { transform: translate(var(--x-move), var(--y-move)) scale(1.5); opacity: 0.3; }
+    100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
   }
   main.gallery {
     display: none;
@@ -216,7 +204,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
   }
   .delete-btn {
     position: absolute;
@@ -246,7 +233,7 @@
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  #previewModal, #signupLoginModal, #messageModal, #disconnectModal {
+  #previewModal, #signupLoginModal, #messageModal, #disconnectModal, #friendRequestModal {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.9);
@@ -257,7 +244,7 @@
     z-index: 10000;
     animation: fadeIn 0.3s ease;
   }
-  #previewModal.show, #signupLoginModal.show, #messageModal.show, #disconnectModal.show {
+  #previewModal.show, #signupLoginModal.show, #messageModal.show, #disconnectModal.show, #friendRequestModal.show {
     display: flex;
   }
   #previewImage {
@@ -277,7 +264,7 @@
     text-decoration: none;
     font-size: 0.85em;
   }
-  #signupLoginModalContent, #messageModalContent, #disconnectModalContent {
+  #signupLoginModalContent, #messageModalContent, #disconnectModalContent, #friendRequestModalContent {
     background: rgba(20, 20, 20, 0.85);
     padding: 20px 25px 30px 25px;
     border-radius: 12px;
@@ -287,10 +274,10 @@
     box-shadow: 0 0 40px rgba(0,0,0,0.9);
     text-align: center;
   }
-  #signupLoginModalContent h2, #messageModalContent h2, #disconnectModalContent h2 {
+  #signupLoginModalContent h2, #messageModalContent h2, #disconnectModalContent h2, #friendRequestModalContent h2 {
     margin-bottom: 15px;
   }
-  #signupUsername, #signupPassword, #loginUsername, #loginPassword, #adminPassword {
+  #signupUsername, #signupPassword, #loginUsername, #loginPassword, #adminPassword, #profileUsername, #profilePassword, #profileConfirmPassword, #searchInput {
     width: 100%;
     padding: 8px 10px;
     font-size: 0.9em;
@@ -300,12 +287,42 @@
     background: #222;
     color: white;
   }
-  #signupLoginButtons, #messageButtons, #disconnectButtons {
+  #profilePictureInput {
+    display: none;
+  }
+  #profilePicturePreview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #profilePictureBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-bottom: 15px;
+  }
+  #profilePictureBtn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: black;
+    transform: scale(1.05);
+  }
+  #signupLoginButtons, #messageButtons, #disconnectButtons, #profileButtons, #friendRequestButtons {
     display: flex;
     justify-content: center;
     gap: 15px;
   }
-  #messageButtons, #disconnectButtons {
+  #messageButtons, #disconnectButtons, #profileButtons, #friendRequestButtons {
     margin-top: 15px;
   }
   button.modalBtn {
@@ -323,10 +340,6 @@
     background: white;
     color: black;
     outline: none;
-  }
-  button.modalBtn:active {
-    background: white;
-    color: black;
   }
   #signupLoginTabs {
     display: flex;
@@ -365,7 +378,6 @@
   #fileInput {
     display: none;
   }
-
   .converter-container {
     display: flex;
     flex-direction: column;
@@ -396,7 +408,7 @@
     flex-direction: column;
     align-items: center;
   }
-  textarea, #outputText {
+  textarea, #outputText, #chatInput {
     width: 100%;
     min-height: 90px;
     padding: 8px;
@@ -409,7 +421,7 @@
     resize: none;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     animation: fadeInUp 0.4s ease;
-    text-align: center;
+    text-align: left;
   }
   #outputText {
     word-wrap: break-word;
@@ -432,7 +444,6 @@
     cursor: pointer;
     transition: background-color 0.3s ease, opacity 0.3s ease;
     opacity: 0.7;
-    backdrop-filter: blur(10px);
   }
   .clear-button:hover {
     background: rgba(255, 255, 255, 0.3);
@@ -457,8 +468,6 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
     width: 100%;
     max-width: 180px;
-    backdrop-filter: blur(10px);
-    text-align: center;
   }
   .button-container button:hover {
     background: rgba(255, 255, 255, 0.3);
@@ -473,127 +482,92 @@
     font-size: 1.2rem;
     animation: fadeInUp 0.4s ease;
   }
-
+  #searchResults, #friendList, #chatMessages {
+    width: 100%;
+    max-width: 500px;
+    margin-top: 20px;
+  }
+  .search-result, .friend-item, .chat-message {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .search-result button, .friend-item button, .chat-message button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: 5px;
+  }
+  .search-result button:hover, .friend-item button:hover, .chat-message button:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .chat-message {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .chat-message p {
+    margin: 5px 0;
+  }
+  .chat-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+    max-width: 500px;
+    flex-wrap: wrap;
+  }
+  .chat-controls button {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .chat-controls button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: black;
+  }
+  .chat-header {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-header h2 {
+    font-size: 1.5rem;
+  }
   @media (max-width: 768px) {
-    header {
-      padding: 10px 15px;
-    }
-    #signupLoginBtn, #uploadBtnHeader {
-      padding: 6px 10px;
-      font-size: 0.8em;
-    }
-    #hamburgerBtn {
-      margin-left: 5px;
-    }
-    #hamburgerBtn span {
-      width: 20px;
-      height: 2.5px;
-    }
-    .menu {
-      top: 50px;
-      right: 15px;
-      padding: 10px;
-      min-width: 140px;
-    }
-    .menu a, .menu button {
-      padding: 8px 10px;
-      font-size: 0.9em;
-    }
-    #welcomeSection, #converterSection {
-      padding: 20px 10px;
-    }
-    #welcomeMessage {
-      font-size: 1.8rem;
-    }
-    #description {
-      font-size: 1rem;
-    }
-    main.gallery {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 10px;
-      padding: 10px;
-    }
-    .card {
-      border-radius: 8px;
-    }
-    #previewImage {
-      max-width: 95%;
-      max-height: 80%;
-      border-radius: 10px;
-    }
-    #previewDownload {
-      top: 15px;
-      left: 15px;
-      padding: 6px 10px;
-      font-size: 0.75em;
-    }
-    #signupLoginModalContent, #messageModalContent, #disconnectModalContent {
+    header { padding: 10px 15px; }
+    #signupLoginBtn, #uploadBtnHeader { padding: 6px 10px; font-size: 0.8em; }
+    #hamburgerBtn span { width: 20px; height: 2.5px; }
+    .menu { top: 50px; right: 15px; padding: 10px; min-width: 140px; }
+    .menu a, .menu button { padding: 8px 10px; font-size: 0.9em; }
+    #welcomeSection, #converterSection, #profileSection, #searchSection, #friendListSection, #chatSection { padding: 20px 10px; }
+    #welcomeMessage { font-size: 1.8rem; }
+    #description { font-size: 1rem; }
+    main.gallery { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; padding: 10px; }
+    #previewImage { max-width: 95%; max-height: 80%; border-radius: 10px; }
+    #signupLoginModalContent, #messageModalContent, #disconnectModalContent, #friendRequestModalContent {
       padding: 15px 20px 25px 20px;
       max-width: 280px;
     }
-    #signupLoginTabs {
-      margin-bottom: 10px;
-    }
-    .tabBtn {
-      padding: 4px 10px;
-      font-size: 0.8em;
-    }
-    #signupUsername, #signupPassword, #loginUsername, #loginPassword, #adminPassword {
-      padding: 6px 8px;
-      font-size: 0.8em;
-      margin-bottom: 10px;
-    }
-    button.modalBtn {
-      padding: 4px 12px;
-      font-size: 0.8em;
-      min-width: 60px;
-    }
-    .converter-container {
-      max-width: 400px;
-    }
-    .converter-container h1 {
-      font-size: 1.5rem;
-    }
-    .instructions {
-      font-size: 0.9em;
-      max-width: 350px;
-    }
-    textarea, #outputText {
-      min-height: 80px;
-      padding: 6px;
-      font-size: 0.8em;
-    }
-    .clear-button {
-      right: 6px;
-      top: 6px;
-      width: 18px;
-      height: 18px;
-      font-size: 0.7em;
-    }
-    .button-container button {
-      padding: 6px 12px;
-      font-size: 0.8em;
-      max-width: 150px;
-    }
-    .converter-container h2 {
-      font-size: 1rem;
-      margin-top: 10px;
-    }
-    footer {
-      padding: 8px;
-      font-size: 0.7em;
-    }
-  }
-
-  @media (min-width: 769px) {
-    main.gallery {
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .card {
-      border-radius: 12px;
-    }
+    .converter-container { max-width: 400px; }
+    .converter-container h1 { font-size: 1.5rem; }
+    .instructions { font-size: 0.9em; max-width: 350px; }
+    textarea, #outputText, #chatInput { min-height: 80px; padding: 6px; font-size: 0.8em; }
+    #searchResults, #friendList, #chatMessages { max-width: 350px; }
   }
 </style>
 </head>
@@ -601,65 +575,121 @@
   <header>
     <div class="logo">Merqace Library</div>
     <div style="display: flex; align-items: center; gap: 10px;">
-      <button id="uploadBtnHeader">Upload</button>
-      <button id="signupLoginBtn">Sign Up/Login</button>
+      <button id="uploadBtnHeader" aria-label="Upload Images">Upload</button>
+      <button id="signupLoginBtn" aria-label="Sign Up or Login">Sign Up/Login</button>
       <button id="hamburgerBtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
-    <nav class="menu" id="menu">
+    <nav class="menu" id="menu" role="navigation">
       <a href="#" id="homeBtn">Home</a>
       <button id="signupLoginMenuBtn">Sign Up/Login</button>
       <a href="#" id="wallpapersBtn" style="display: none;">Wallpapers</a>
       <a href="#" id="converterBtn" style="display: none;">Numora Converter</a>
+      <a href="#" id="profileBtn" style="display: none;">Profile</a>
+      <a href="#" id="searchBtn" style="display: none;">Search Users</a>
+      <a href="#" id="friendListBtn" style="display: none;">Friend List</a>
       <button id="disconnectBtn" style="display: none;">Disconnect</button>
     </nav>
   </header>
 
-  <div id="uploadProgress"></div>
+  <div id="uploadProgress" role="status"></div>
 
-  <section id="welcomeSection">
-    <div id="welcomeMessage"></div>
-    <div id="description"></div>
+  <section id="welcomeSection" role="main">
+    <div id="welcomeMessage" aria-live="polite"></div>
+    <div id="description" aria-live="polite"></div>
   </section>
 
-  <main class="gallery" id="gallery">
-    <!-- Images will be added dynamically -->
-  </main>
+  <main class="gallery" id="gallery" role="region" aria-label="Image Gallery"></main>
 
-  <section id="converterSection">
+  <section id="converterSection" role="region" aria-label="Numora Converter">
     <div class="converter-container">
       <h1>Numora Converter</h1>
       <p class="instructions">
-        Convert text between the alphabet and Numora in real-time! Simply type in the box below, and the conversion will happen automatically. Use the buttons to switch conversion modes or copy the result.
+        Convert text between the alphabet and Numora in real-time! Type in the box below, and the conversion will happen automatically.
       </p>
       <div class="textarea-container">
-        <textarea id="inputText" rows="4" placeholder="Enter text here..."></textarea>
-        <button class="clear-button" onclick="clearText()">×</button>
+        <textarea id="inputText" rows="4" placeholder="Enter text here..." aria-label="Input text for conversion"></textarea>
+        <button class="clear-button" onclick="clearText()" aria-label="Clear input text">×</button>
       </div>
       <div class="button-container">
-        <button onclick="toggleConversion()" id="toggleButton">Alphabet → Numora</button>
+        <button id="toggleButton" onclick="toggleConversion()">Alphabet → Numora</button>
         <button onclick="copyOutput()">Copy Converted Text</button>
       </div>
       <h2>Converted Text:</h2>
-      <p id="outputText"></p>
+      <p id="outputText" aria-live="polite"></p>
     </div>
   </section>
 
-  <input type="file" id="fileInput" accept="image/*" multiple />
+  <section id="profileSection" role="region" aria-label="Profile Settings">
+    <div class="converter-container">
+      <h1>Edit Profile</h1>
+      <p class="instructions">Update your profile picture, username, or password.</p>
+      <img id="profilePicturePreview" src="" alt="Profile picture preview" />
+      <button id="profilePictureBtn" aria-label="Change Profile Picture">Change Profile Picture</button>
+      <input type="text" id="profileUsername" placeholder="New Username" aria-label="New Username" />
+      <input type="password" id="profilePassword" placeholder="New Password" aria-label="New Password" />
+      <input type="password" id="profileConfirmPassword" placeholder="Confirm New Password" aria-label="Confirm New Password" />
+      <div id="profileButtons">
+        <button class="modalBtn" id="profileSaveBtn">Save</button>
+        <button class="modalBtn" id="profileCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="searchSection" role="region" aria-label="Search Users">
+    <div class="converter-container">
+      <h1>Search Users</h1>
+      <p class="instructions">Enter a username to find other users and send friend requests.</p>
+      <input type="text" id="searchInput" placeholder="Search by username" aria-label="Search by username" />
+      <div id="searchResults" role="list"></div>
+      <h2>Friend Requests</h2>
+      <div id="friendRequests" role="list"></div>
+    </div>
+  </section>
+
+  <section id="friendListSection" role="region" aria-label="Friend List">
+    <div class="converter-container">
+      <h1>Friend List</h1>
+      <p class="instructions">Select a friend to start chatting.</p>
+      <div id="friendList" role="list"></div>
+    </div>
+  </section>
+
+  <section id="chatSection" role="region" aria-label="Chat">
+    <div class="converter-container">
+      <div class="chat-header">
+        <h2 id="chatFriendName"></h2>
+        <button id="removeFriendBtn" style="display: none;">Remove Friend</button>
+      </div>
+      <div id="chatMessages" role="log" aria-live="polite"></div>
+      <div class="textarea-container">
+        <textarea id="chatInput" rows="2" placeholder="Type a message..." aria-label="Type a message"></textarea>
+        <button class="clear-button" onclick="document.getElementById('chatInput').value = ''" aria-label="Clear chat input">×</button>
+      </div>
+      <div class="chat-controls">
+        <button id="sendMessageBtn">Send</button>
+        <button id="toggleNumoraBtn">Normal</button>
+        <button id="backToFriendsBtn">Back to Friends</button>
+      </div>
+    </div>
+  </section>
+
+  <input type="file" id="fileInput" accept="image/*" multiple aria-label="Upload images" />
+  <input type="file" id="profilePictureInput" accept="image/*" aria-label="Upload profile picture" />
 
   <div id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewLabel">
     <a id="previewDownload" download target="_blank" aria-label="Download image">Download</a>
     <img id="previewImage" src="" alt="Wallpaper preview" />
   </div>
 
-  <div id="signupLoginModal" role="dialog" aria-modal="true" aria-labelledby="signupLoginTitle" tabindex="-1">
+  <div id="signupLoginModal" role="dialog" aria-modal="true" aria-labelledby="signupLoginTitle" tabIndex="-1">
     <div id="signupLoginModalContent">
       <h2 id="signupLoginTitle">Sign Up or Login</h2>
-      <div id="signupLoginTabs">
-        <button class="tabBtn active" id="signupTabBtn" onclick="showTab('signup')">Sign Up</button>
-        <button class="tabBtn" id="loginTabBtn" onclick="showTab('login')">Login</button>
-        <button class="tabBtn" id="adminTabBtn" onclick="showTab('admin')">Admin</button>
+      <div id="signupLoginTabs" role="tablist">
+        <button class="tabBtn active" id="signupTabBtn" onclick="showTab('signup')" role="tab" aria-selected="true">Sign Up</button>
+        <button class="tabBtn" id="loginTabBtn" onclick="showTab('login')" role="tab" aria-selected="false">Login</button>
+        <button class="tabBtn" id="adminTabBtn" onclick="showTab('admin')" role="tab" aria-selected="false">Admin</button>
       </div>
-      <div id="signupTab" class="tabContent active">
+      <div id="signupTab" class="tabContent active" role="tabpanel">
         <input type="text" id="signupUsername" placeholder="Username" aria-describedby="signupDesc" />
         <input type="password" id="signupPassword" placeholder="Password" />
         <div id="signupLoginButtons">
@@ -667,7 +697,7 @@
           <button class="modalBtn" id="signupLoginCloseBtn">Close</button>
         </div>
       </div>
-      <div id="loginTab" class="tabContent">
+      <div id="loginTab" class="tabContent" role="tabpanel">
         <input type="text" id="loginUsername" placeholder="Username" aria-describedby="loginDesc" />
         <input type="password" id="loginPassword" placeholder="Password" />
         <div id="signupLoginButtons">
@@ -675,7 +705,7 @@
           <button class="modalBtn" id="signupLoginCloseBtn">Close</button>
         </div>
       </div>
-      <div id="adminTab" class="tabContent">
+      <div id="adminTab" class="tabContent" role="tabpanel">
         <input type="password" id="adminPassword" placeholder="Enter admin code" aria-describedby="adminDesc" />
         <div id="signupLoginButtons">
           <button class="modalBtn" id="adminSubmitBtn">Submit</button>
@@ -685,17 +715,17 @@
     </div>
   </div>
 
-  <div id="messageModal" role="alertdialog" aria-modal="true" aria-labelledby="messageTitle" tabindex="-1">
+  <div id="messageModal" role="alertdialog" aria-modal="true" aria-labelledby="messageTitle" tabIndex="-1">
     <div id="messageModalContent">
-      <h2 id="messageTitle"></h2>
-      <p id="messageText"></p>
+      <h2 id="messageTitle">Message</h2>
+      <p id="messageText" aria-live="assertive"></p>
       <div id="messageButtons">
         <button class="modalBtn" id="messageCloseBtn">Close</button>
       </div>
     </div>
   </div>
 
-  <div id="disconnectModal" role="alertdialog" aria-modal="true" aria-labelledby="disconnectTitle" tabindex="-1">
+  <div id="disconnectModal" role="alertdialog" aria-modal="true" aria-labelledby="disconnectTitle" tabIndex="-1">
     <div id="disconnectModalContent">
       <h2 id="disconnectTitle">Confirm Disconnect</h2>
       <p id="disconnectText">Are you sure you want to disconnect?</p>
@@ -706,599 +736,1034 @@
     </div>
   </div>
 
-  <footer>
+  <div id="friendRequestModal" role="alertdialog" aria-modal="true" aria-labelledby="friendRequestTitle" tabIndex="-1">
+    <div id="friendRequestModalContent">
+      <h2 id="friendRequestTitle">Friend Request</h2>
+      <p id="friendRequestText" aria-live="assertive"></p>
+      <div id="friendRequestButtons">
+        <button class="modalBtn" id="acceptFriendBtn">Accept</button>
+        <button class="modalBtn" id="declineFriendBtn">Decline</button>
+        <button class="modalBtn" id="friendRequestCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer role="contentinfo">
     © 2025 Merqace Library. All rights reserved.
   </footer>
 
 <script>
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const menu = document.getElementById('menu');
-  const signupLoginBtn = document.getElementById('signupLoginBtn');
-  const signupLoginMenuBtn = document.getElementById('signupLoginMenuBtn');
-  const uploadBtnHeader = document.getElementById('uploadBtnHeader');
-  const signupLoginModal = document.getElementById('signupLoginModal');
-  const signupLoginCloseBtn = document.querySelectorAll('#signupLoginCloseBtn');
-  const signupSubmitBtn = document.getElementById('signupSubmitBtn');
-  const loginSubmitBtn = document.getElementById('loginSubmitBtn');
-  const adminSubmitBtn = document.getElementById('adminSubmitBtn');
-  const signupUsername = document.getElementById('signupUsername');
-  const signupPassword = document.getElementById('signupPassword');
-  const loginUsername = document.getElementById('loginUsername');
-  const loginPassword = document.getElementById('loginPassword');
-  const adminPassword = document.getElementById('adminPassword');
-  const messageModal = document.getElementById('messageModal');
-  const messageText = document.getElementById('messageText');
-  const messageCloseBtn = document.getElementById('messageCloseBtn');
-  const disconnectBtn = document.getElementById('disconnectBtn');
-  const disconnectModal = document.getElementById('disconnectModal');
-  const disconnectConfirmBtn = document.getElementById('disconnectConfirmBtn');
-  const disconnectCancelBtn = document.getElementById('disconnectCancelBtn');
-  const homeBtn = document.getElementById('homeBtn');
-  const wallpapersBtn = document.getElementById('wallpapersBtn');
-  const converterBtn = document.getElementById('converterBtn');
-  const previewModal = document.getElementById('previewModal');
-  const previewImage = document.getElementById('previewImage');
-  const previewDownload = document.getElementById('previewDownload');
-  const gallery = document.getElementById('gallery');
-  const fileInput = document.getElementById('fileInput');
-  const welcomeMessage = document.getElementById('welcomeMessage');
-  const description = document.getElementById('description');
-  const welcomeSection = document.getElementById('welcomeSection');
-  const converterSection = document.getElementById('converterSection');
-  const logo = document.querySelector('.logo');
-  const uploadProgress = document.getElementById('uploadProgress');
+  // Element references
+  const elements = {
+    hamburgerBtn: document.getElementById('hamburgerBtn'),
+    menu: document.getElementById('menu'),
+    signupLoginBtn: document.getElementById('signupLoginBtn'),
+    signupLoginMenuBtn: document.getElementById('signupLoginMenuBtn'),
+    uploadBtnHeader: document.getElementById('uploadBtnHeader'),
+    signupLoginModal: document.getElementById('signupLoginModal'),
+    signupLoginCloseBtn: document.querySelectorAll('#signupLoginCloseBtn'),
+    signupSubmitBtn: document.getElementById('signupSubmitBtn'),
+    loginSubmitBtn: document.getElementById('loginSubmitBtn'),
+    adminSubmitBtn: document.getElementById('adminSubmitBtn'),
+    signupUsername: document.getElementById('signupUsername'),
+    signupPassword: document.getElementById('signupPassword'),
+    loginUsername: document.getElementById('loginUsername'),
+    loginPassword: document.getElementById('loginPassword'),
+    adminPassword: document.getElementById('adminPassword'),
+    messageModal: document.getElementById('messageModal'),
+    messageText: document.getElementById('messageText'),
+    messageCloseBtn: document.getElementById('messageCloseBtn'),
+    disconnectBtn: document.getElementById('disconnectBtn'),
+    disconnectModal: document.getElementById('disconnectModal'),
+    disconnectConfirmBtn: document.getElementById('disconnectConfirmBtn'),
+    disconnectCancelBtn: document.getElementById('disconnectCancelBtn'),
+    homeBtn: document.getElementById('homeBtn'),
+    wallpapersBtn: document.getElementById('wallpapersBtn'),
+    converterBtn: document.getElementById('converterBtn'),
+    profileBtn: document.getElementById('profileBtn'),
+    searchBtn: document.getElementById('searchBtn'),
+    friendListBtn: document.getElementById('friendListBtn'),
+    profileSection: document.getElementById('profileSection'),
+    searchSection: document.getElementById('searchSection'),
+    friendListSection: document.getElementById('friendListSection'),
+    chatSection: document.getElementById('chatSection'),
+    profilePictureInput: document.getElementById('profilePictureInput'),
+    profilePicturePreview: document.getElementById('profilePicturePreview'),
+    profilePictureBtn: document.getElementById('profilePictureBtn'),
+    profileUsername: document.getElementById('profileUsername'),
+    profilePassword: document.getElementById('profilePassword'),
+    profileConfirmPassword: document.getElementById('profileConfirmPassword'),
+    profileSaveBtn: document.getElementById('profileSaveBtn'),
+    profileCancelBtn: document.getElementById('profileCancelBtn'),
+    searchInput: document.getElementById('searchInput'),
+    searchResults: document.getElementById('searchResults'),
+    friendRequests: document.getElementById('friendRequests'),
+    friendList: document.getElementById('friendList'),
+    chatMessages: document.getElementById('chatMessages'),
+    chatInput: document.getElementById('chatInput'),
+    sendMessageBtn: document.getElementById('sendMessageBtn'),
+    toggleNumoraBtn: document.getElementById('toggleNumoraBtn'),
+    backToFriendsBtn: document.getElementById('backToFriendsBtn'),
+    removeFriendBtn: document.getElementById('removeFriendBtn'),
+    friendRequestModal: document.getElementById('friendRequestModal'),
+    friendRequestText: document.getElementById('friendRequestText'),
+    acceptFriendBtn: document.getElementById('acceptFriendBtn'),
+    declineFriendBtn: document.getElementById('declineFriendBtn'),
+    friendRequestCloseBtn: document.getElementById('friendRequestCloseBtn'),
+    previewModal: document.getElementById('previewModal'),
+    previewImage: document.getElementById('previewImage'),
+    previewDownload: document.getElementById('previewDownload'),
+    gallery: document.getElementById('gallery'),
+    fileInput: document.getElementById('fileInput'),
+    welcomeMessage: document.getElementById('welcomeMessage'),
+    description: document.getElementById('description'),
+    welcomeSection: document.getElementById('welcomeSection'),
+    converterSection: document.getElementById('converterSection'),
+    logo: document.querySelector('.logo'),
+    uploadProgress: document.getElementById('uploadProgress'),
+    inputText: document.getElementById('inputText'),
+    outputText: document.getElementById('outputText'),
+    toggleButton: document.getElementById('toggleButton'),
+    chatFriendName: document.getElementById('chatFriendName')
+  };
 
-  let isLoggedIn = false;
-  let isAdmin = false;
-  let uploadedImages = [];
+  // Define modals and sections collections upfront
+  elements.modals = {
+    signupLoginModal: elements.signupLoginModal,
+    messageModal: elements.messageModal,
+    previewModal: elements.previewModal,
+    disconnectModal: elements.disconnectModal,
+    friendRequestModal: elements.friendRequestModal
+  };
 
-  // Load state from localStorage on page load
+  elements.sections = {
+    welcomeSection: elements.welcomeSection,
+    gallery: elements.gallery,
+    converterSection: elements.converterSection,
+    profileSection: elements.profileSection,
+    searchSection: elements.searchSection,
+    friendListSection: elements.friendListSection,
+    chatSection: elements.chatSection
+  };
+
+  // State variables
+  let state = {
+    isLoggedIn: false,
+    isAdmin: false,
+    currentUsername: '',
+    uploadedImages: [],
+    currentChatFriend: '',
+    isNumoraMode: false,
+    pollingInterval: null,
+    lastMessageCount: null
+  };
+
+  // Numora alphabet mapping
+  const numoraAlphabet = {
+    'a': '∣', 'b': '‒', 'c': 'ˁ', 'd': '●', 'e': '⋋', 'f': '⋌', 'g': '≺', 'h': '⋏', 'i': '≖', 'j': '≻',
+    'k': '⊼', 'l': '∦', 'm': '⋂', 'n': '⋃', 'o': '∅', 'p': '∸', 'q': '∀', 'r': '∈', 's': '∼', 't': 'T',
+    'u': '∃', 'v': '⋎', 'w': 'w', 'x': 'X', 'y': 'Y', 'z': 'Ω'
+  };
+  const reverseNumora = Object.fromEntries(Object.entries(numoraAlphabet).map(([k, v]) => [v, k]));
+
+  // Initialize on page load
   window.onload = () => {
-    previewModal.classList.remove('show');
-    signupLoginModal.classList.remove('show');
-    messageModal.classList.remove('show');
-    disconnectModal.classList.remove('show');
-
-    // Restore login state
-    isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    isAdmin = localStorage.getItem('isAdmin') === 'true';
-
-    // Restore last viewed section
-    const lastSection = localStorage.getItem('currentSection') || 'home';
-    showSection(lastSection);
-
-    // Restore uploaded images
-    const storedImages = localStorage.getItem('uploadedImages');
-    if (storedImages) {
-      try {
-        uploadedImages = JSON.parse(storedImages);
-        gallery.innerHTML = '';
-        uploadedImages.forEach(image => {
-          addImageToGallery(image.url, image.name);
-        });
-      } catch (e) {
-        showMessage('Error loading images from storage. Storage may be corrupted.');
-        localStorage.removeItem('uploadedImages');
-        uploadedImages = [];
-      }
-    }
-
+    Object.values(elements.modals).forEach(modal => {
+      if (modal) modal.classList.remove('show');
+    });
+    loadState();
+    showSection(localStorage.getItem('currentSection') || 'home');
+    loadImages();
     updateMenuVisibility();
     typeWelcome();
     createDots();
+    if (state.isLoggedIn && !state.isAdmin) {
+      updateFriendRequests();
+    }
   };
 
-  function showSection(section) {
-    welcomeSection.style.display = 'none';
-    gallery.style.display = 'none';
-    converterSection.style.display = 'none';
-    signupLoginBtn.style.display = 'none';
-    uploadBtnHeader.style.display = 'none';
+  function loadState() {
+    state.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    state.isAdmin = localStorage.getItem('isAdmin') === 'true';
+    state.currentUsername = localStorage.getItem('currentUsername') || '';
+    if (state.isLoggedIn && !state.isAdmin && state.currentUsername) {
+      const users = getJSON('users', []);
+      if (!users.some(u => u.username === state.currentUsername)) {
+        logout();
+        showMessage('Session invalid. Please log in again.');
+      }
+    }
+  }
 
-    if (section === 'home') {
-      welcomeSection.style.display = 'flex';
-      signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
-      logo.classList.add('hidden');
-    } else if (section === 'wallpapers') {
-      if (!isLoggedIn && !isAdmin) {
-        showMessage('Please sign up or log in to access Wallpapers.');
-        showSection('home');
-        return;
+  function loadImages() {
+    const storedImages = localStorage.getItem('uploadedImages');
+    if (storedImages) {
+      try {
+        state.uploadedImages = JSON.parse(storedImages);
+        elements.gallery.innerHTML = '';
+        state.uploadedImages.forEach(image => addImageToGallery(image.url, image.name));
+      } catch {
+        showMessage('Error loading images.');
+        localStorage.removeItem('uploadedImages');
+        state.uploadedImages = [];
       }
-      gallery.style.display = 'grid';
-      uploadBtnHeader.style.display = 'block';
-      logo.classList.remove('hidden');
-    } else if (section === 'converter') {
-      if (!isLoggedIn && !isAdmin) {
-        showMessage('Please sign up or log in to access Numora Converter.');
-        showSection('home');
-        return;
-      }
-      converterSection.style.display = 'flex';
-      logo.classList.remove('hidden');
+    }
+  }
+
+  function showSection(section) {
+    Object.values(elements.sections).forEach(s => {
+      if (s) s.style.display = 'none';
+    });
+    elements.signupLoginBtn.style.display = 'none';
+    elements.uploadBtnHeader.style.display = 'none';
+    elements.logo.classList.remove('hidden');
+
+    switch (section) {
+      case 'home':
+        elements.welcomeSection.style.display = 'flex';
+        elements.signupLoginBtn.style.display = state.isLoggedIn || state.isAdmin ? 'none' : 'block';
+        elements.logo.classList.add('hidden');
+        break;
+      case 'wallpapers':
+        if (!state.isLoggedIn && !state.isAdmin) {
+          showMessage('Please sign up or log in to access Wallpapers.');
+          return showSection('home');
+        }
+        elements.gallery.style.display = 'grid';
+        elements.uploadBtnHeader.style.display = 'block';
+        break;
+      case 'converter':
+        if (!state.isLoggedIn && !state.isAdmin) {
+          showMessage('Please sign up or log in to access Numora Converter.');
+          return showSection('home');
+        }
+        elements.converterSection.style.display = 'flex';
+        break;
+      case 'profile':
+        if (!state.isLoggedIn && !state.isAdmin) {
+          showMessage('Please sign up or log in to access Profile.');
+          return showSection('home');
+        }
+        elements.profileSection.style.display = 'flex';
+        loadProfileData();
+        break;
+      case 'search':
+        if (!state.isLoggedIn || state.isAdmin) {
+          showMessage('Please log in as a regular user to search users.');
+          return showSection('home');
+        }
+        elements.searchSection.style.display = 'flex';
+        updateFriendRequests();
+        break;
+      case 'friendList':
+        if (!state.isLoggedIn || state.isAdmin) {
+          showMessage('Please log in as a regular user to view friends.');
+          return showSection('home');
+        }
+        elements.friendListSection.style.display = 'flex';
+        updateFriendList();
+        break;
+      case 'chat':
+        if (!state.isLoggedIn || state.isAdmin) {
+          showMessage('Please log in as a regular user to chat.');
+          return showSection('home');
+        }
+        elements.chatSection.style.display = 'flex';
+        break;
     }
     localStorage.setItem('currentSection', section);
   }
 
   function updateMenuVisibility() {
-    if (isLoggedIn || isAdmin) {
-      signupLoginBtn.style.display = 'none';
-      signupLoginMenuBtn.style.display = 'none';
-      wallpapersBtn.style.display = 'block';
-      converterBtn.style.display = 'block';
-      disconnectBtn.style.display = 'block';
-    } else {
-      signupLoginBtn.style.display = 'block';
-      signupLoginMenuBtn.style.display = 'block';
-      wallpapersBtn.style.display = 'none';
-      converterBtn.style.display = 'none';
-      disconnectBtn.style.display = 'none';
-    }
+    const visibility = {
+      signupLoginBtn: !state.isLoggedIn && !state.isAdmin,
+      signupLoginMenuBtn: !state.isLoggedIn && !state.isAdmin,
+      wallpapersBtn: state.isLoggedIn || state.isAdmin,
+      converterBtn: state.isLoggedIn || state.isAdmin,
+      profileBtn: state.isLoggedIn || state.isAdmin,
+      disconnectBtn: state.isLoggedIn || state.isAdmin,
+      searchBtn: state.isLoggedIn && !state.isAdmin,
+      friendListBtn: state.isLoggedIn && !state.isAdmin
+    };
+    Object.entries(visibility).forEach(([id, show]) => {
+      if (elements[id]) elements[id].style.display = show ? 'block' : 'none';
+    });
   }
 
-  const welcomeText = "Welcome to Merqace Library!";
-  const descText = "Download various wallpapers made by me.";
-  let i = 0;
-  let j = 0;
+  function loadProfileData() {
+    elements.profileUsername.value = state.currentUsername;
+    elements.profilePassword.value = '';
+    elements.profileConfirmPassword.value = '';
+    const users = getJSON('users', []);
+    const user = users.find(u => u.username === state.currentUsername);
+    elements.profilePicturePreview.src = user?.profilePicture || '';
+    const disabled = state.isAdmin;
+    elements.profileUsername.disabled = disabled;
+    elements.profilePassword.disabled = disabled;
+    elements.profileConfirmPassword.disabled = disabled;
+    elements.profilePictureBtn.disabled = disabled;
+    elements.profileSaveBtn.disabled = disabled;
+    if (disabled) showMessage('Admin accounts cannot modify profile details.');
+  }
 
   function typeWelcome() {
-    if (i < welcomeText.length) {
-      welcomeMessage.textContent = welcomeText.substring(0, i + 1);
-      welcomeMessage.innerHTML += '<span class="cursor"></span>';
-      i++;
-      setTimeout(typeWelcome, 100);
-    } else {
-      welcomeMessage.innerHTML = welcomeText;
-      setTimeout(typeDescription, 500);
+    const text = "Welcome to Merqace Library!";
+    let i = 0;
+    function type() {
+      if (i < text.length) {
+        elements.welcomeMessage.textContent = text.substring(0, ++i);
+        elements.welcomeMessage.innerHTML += '<span class="cursor"></span>';
+        setTimeout(type, 100);
+      } else {
+        elements.welcomeMessage.innerHTML = text;
+        typeDescription();
+      }
     }
+    type();
   }
 
   function typeDescription() {
-    if (j < descText.length) {
-      description.textContent = descText.substring(0, j + 1);
-      description.innerHTML += '<span class="cursor"></span>';
-      j++;
-      setTimeout(typeDescription, 80);
-    } else {
-      description.innerHTML = descText;
+    const text = "";
+    let i = 0;
+    function type() {
+      if (i < text.length) {
+        elements.description.textContent = text.substring(0, ++i);
+        elements.description.innerHTML += '<span class="cursor"></span>';
+        setTimeout(type, 80);
+      } else {
+        elements.description.innerHTML = text;
+      }
     }
+    type();
   }
 
   function createDots() {
-    const numDots = 20;
-    for (let k = 0; k < numDots; k++) {
+    for (let i = 0; i < 20; i++) {
       const dot = document.createElement('div');
       dot.classList.add('dot');
-      const size = Math.random() * 8 + 2;
-      const xPos = Math.random() * 100;
-      const yPos = Math.random() * 100;
-      const xMove = (Math.random() - 0.5) * 100;
-      const yMove = (Math.random() - 0.5) * 100;
-      const delay = Math.random() * 5;
-      dot.style.width = `${size}px`;
-      dot.style.height = `${size}px`;
-      dot.style.left = `${xPos}%`;
-      dot.style.top = `${yPos}%`;
-      dot.style.setProperty('--x-move', `${xMove}px`);
-      dot.style.setProperty('--y-move', `${yMove}px`);
-      dot.style.animationDelay = `${delay}s`;
-      welcomeSection.appendChild(dot);
+      Object.assign(dot.style, {
+        width: `${Math.random() * 8 + 2}px`,
+        height: `${Math.random() * 8 + 2}px`,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        '--x-move': `${(Math.random() - 0.5) * 100}px`,
+        '--y-move': `${(Math.random() - 0.5) * 100}px`,
+        animationDelay: `${Math.random() * 5}s`
+      });
+      elements.welcomeSection.appendChild(dot);
     }
   }
 
-  hamburgerBtn.addEventListener('click', () => {
-    const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true' || false;
-    hamburgerBtn.setAttribute('aria-expanded', !expanded);
-    hamburgerBtn.classList.toggle('active');
-    menu.classList.toggle('show');
+  elements.hamburgerBtn.addEventListener('click', () => {
+    const expanded = elements.hamburgerBtn.getAttribute('aria-expanded') === 'true';
+    elements.hamburgerBtn.setAttribute('aria-expanded', !expanded);
+    elements.hamburgerBtn.classList.toggle('active');
+    elements.menu.classList.toggle('show');
   });
 
-  [homeBtn, wallpapersBtn, converterBtn].forEach(btn => {
-    btn.addEventListener('click', e => {
+  ['homeBtn', 'wallpapersBtn', 'converterBtn', 'profileBtn', 'searchBtn', 'friendListBtn'].forEach(id => {
+    elements[id].addEventListener('click', e => {
       e.preventDefault();
-      hamburgerBtn.setAttribute('aria-expanded', 'false');
-      hamburgerBtn.classList.remove('active');
-      menu.classList.remove('show');
-
-      if (btn.textContent === "Home") {
-        showSection('home');
-      } else if (btn.textContent === "Wallpapers") {
-        showSection('wallpapers');
-      } else if (btn.textContent === "Numora Converter") {
-        showSection('converter');
-      }
+      elements.hamburgerBtn.setAttribute('aria-expanded', 'false');
+      elements.hamburgerBtn.classList.remove('active');
+      elements.menu.classList.remove('show');
+      const sections = {
+        'Home': 'home',
+        'Wallpapers': 'wallpapers',
+        'Numora Converter': 'converter',
+        'Profile': 'profile',
+        'Search Users': 'search',
+        'Friend List': 'friendList'
+      };
+      showSection(sections[elements[id].textContent]);
     });
   });
 
-  fileInput.addEventListener('change', (e) => {
+  elements.fileInput.addEventListener('change', handleImageUpload);
+
+  function handleImageUpload(e) {
     const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-
-    let processedImages = 0;
-    const totalFiles = files.length;
-    let validFiles = 0;
-    uploadProgress.style.display = 'block';
-    uploadProgress.textContent = `Uploading 0/${totalFiles} images...`;
-
+    if (!files.length) return;
+    let processed = 0, valid = 0;
+    const total = files.length;
+    elements.uploadProgress.style.display = 'block';
+    elements.uploadProgress.textContent = `Uploading 0/${total} images...`;
     const newImages = [];
-    files.forEach((file) => {
-      // Check file size (5MB = 5 * 1024 * 1024 bytes)
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        showMessage(`File "${file.name}" exceeds 5MB limit and will be skipped.`);
-        processedImages++;
-        uploadProgress.textContent = `Uploading ${processedImages}/${totalFiles} images...`;
-        if (processedImages === totalFiles) {
-          uploadProgress.style.display = 'none';
-          if (validFiles > 0) {
-            showMessage(`${validFiles} image${validFiles > 1 ? 's' : ''} uploaded successfully!`);
-          } else {
-            showMessage('No valid images uploaded.');
-          }
-        }
+    files.forEach(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        showMessage(`File "${file.name}" exceeds 5MB limit.`);
+        processed++;
+        updateUploadProgress(processed, total, valid);
         return;
       }
-
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = event => {
         const imageUrl = event.target.result;
-        const fileName = file.name;
-
-        // Add to gallery and temporary array
-        addImageToGallery(imageUrl, fileName);
-        newImages.push({ url: imageUrl, name: fileName });
-        validFiles++;
-
-        processedImages++;
-        uploadProgress.textContent = `Uploading ${processedImages}/${totalFiles} images...`;
-
-        if (processedImages === totalFiles) {
-          // Append new images to uploadedImages
-          uploadedImages.push(...newImages);
-
-          // Save to localStorage
-          try {
-            localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
-            uploadProgress.style.display = 'none';
-            showMessage(`${validFiles} image${validFiles > 1 ? 's' : ''} uploaded successfully!`);
-          } catch (e) {
-            uploadProgress.style.display = 'none';
-            showMessage('Storage limit reached. Only some images were saved. Please remove some images or reduce their size.');
-            // Remove excess images until storage fits
-            while (uploadedImages.length > 0) {
-              uploadedImages.pop();
-              try {
-                localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
-                break;
-              } catch (e) {
-                continue;
-              }
-            }
-            gallery.innerHTML = '';
-            uploadedImages.forEach(image => {
-              addImageToGallery(image.url, image.name);
-            });
-          }
+        addImageToGallery(imageUrl, file.name);
+        newImages.push({ url: imageUrl, name: file.name });
+        valid++;
+        processed++;
+        updateUploadProgress(processed, total, valid);
+        if (processed === total) {
+          state.uploadedImages.push(...newImages);
+          saveImages();
         }
       };
       reader.onerror = () => {
-        processedImages++;
-        uploadProgress.textContent = `Uploading ${processedImages}/${totalFiles} images...`;
-        if (processedImages === totalFiles) {
-          uploadProgress.style.display = 'none';
-          showMessage('Some images failed to upload.');
-        }
+        processed++;
+        updateUploadProgress(processed, total, valid);
       };
       reader.readAsDataURL(file);
     });
+    elements.fileInput.value = '';
+  }
 
-    fileInput.value = '';
-  });
+  function updateUploadProgress(processed, total, valid) {
+    elements.uploadProgress.textContent = `Uploading ${processed}/${total} images...`;
+    if (processed === total) {
+      elements.uploadProgress.style.display = 'none';
+      showMessage(valid > 0 ? `${valid} image${valid > 1 ? 's' : ''} uploaded successfully!` : 'No valid images uploaded.');
+    }
+  }
 
   function addImageToGallery(imageUrl, fileName) {
     const card = document.createElement('div');
     card.classList.add('card');
-
     const img = document.createElement('img');
     img.src = imageUrl;
     img.alt = 'Uploaded image';
-
-    // Add delete button for admins
-    if (isAdmin) {
+    if (state.isAdmin) {
       const deleteBtn = document.createElement('button');
       deleteBtn.classList.add('delete-btn');
       deleteBtn.textContent = '×';
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent triggering the preview modal
-        const index = uploadedImages.findIndex(img => img.url === imageUrl);
+      deleteBtn.setAttribute('aria-label', 'Delete image');
+      deleteBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const index = state.uploadedImages.findIndex(img => img.url === imageUrl);
         if (index !== -1) {
-          uploadedImages.splice(index, 1);
-          localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+          state.uploadedImages.splice(index, 1);
+          saveImages();
           card.remove();
           showMessage('Image deleted successfully.');
         }
       });
       card.appendChild(deleteBtn);
     }
-
     card.appendChild(img);
-    gallery.appendChild(card);
-
+    elements.gallery.appendChild(card);
     card.addEventListener('click', () => {
-      previewImage.src = imageUrl;
-      previewDownload.href = imageUrl;
-      previewDownload.download = fileName;
-      previewModal.classList.add('show');
-      signupLoginBtn.style.display = 'none';
-      uploadBtnHeader.style.display = 'none';
-      logo.classList.remove('hidden');
+      elements.previewImage.src = imageUrl;
+      elements.previewDownload.href = imageUrl;
+      elements.previewDownload.download = fileName;
+      elements.previewModal.classList.add('show');
+      elements.signupLoginBtn.style.display = 'none';
+      elements.uploadBtnHeader.style.display = 'none';
+      elements.logo.classList.remove('hidden');
     });
   }
 
-  uploadBtnHeader.addEventListener('click', () => {
-    if (isAdmin) {
-      fileInput.click();
-    } else {
-      showMessage('Only admin is allowed to upload');
+  function saveImages() {
+    try {
+      localStorage.setItem('uploadedImages', JSON.stringify(state.uploadedImages));
+    } catch {
+      showMessage('Storage limit reached. Some images not saved.');
+      while (state.uploadedImages.length > 0) {
+        state.uploadedImages.pop();
+        try {
+          localStorage.setItem('uploadedImages', JSON.stringify(state.uploadedImages));
+          break;
+        } catch {}
+      }
+      elements.gallery.innerHTML = '';
+      state.uploadedImages.forEach(image => addImageToGallery(image.url, image.name));
     }
+  }
+
+  elements.uploadBtnHeader.addEventListener('click', () => {
+    if (state.isAdmin) elements.fileInput.click();
+    else showMessage('Only admins can upload images.');
   });
 
-  signupLoginBtn.addEventListener('click', openSignupLoginModal);
-  signupLoginMenuBtn.addEventListener('click', openSignupLoginModal);
+  [elements.signupLoginBtn, elements.signupLoginMenuBtn].forEach(btn => btn.addEventListener('click', openSignupLoginModal));
 
   function openSignupLoginModal() {
-    signupLoginModal.classList.add('show');
+    elements.signupLoginModal.classList.add('show');
     showTab('signup');
-    signupUsername.value = '';
-    signupPassword.value = '';
-    loginUsername.value = '';
-    loginPassword.value = '';
-    adminPassword.value = '';
-    signupUsername.focus();
-    signupLoginBtn.style.display = 'none';
-    uploadBtnHeader.style.display = 'none';
-    logo.classList.remove('hidden');
+    ['signupUsername', 'signupPassword', 'loginUsername', 'loginPassword', 'adminPassword'].forEach(id => elements[id].value = '');
+    elements.signupUsername.focus();
+    elements.signupLoginBtn.style.display = 'none';
+    elements.uploadBtnHeader.style.display = 'none';
+    elements.logo.classList.remove('hidden');
   }
 
-  signupLoginCloseBtn.forEach(button => {
-    button.addEventListener('click', () => {
-      signupLoginModal.classList.remove('show');
-      if (welcomeSection.style.display === 'flex') {
-        signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
-        logo.classList.add('hidden');
-      }
-      if (gallery.style.display === 'grid') {
-        uploadBtnHeader.style.display = 'block';
-      }
-    });
-  });
+  elements.signupLoginCloseBtn.forEach(btn => btn.addEventListener('click', closeSignupLoginModal));
+
+  function closeSignupLoginModal() {
+    elements.signupLoginModal.classList.remove('show');
+    if (elements.welcomeSection.style.display === 'flex') {
+      elements.signupLoginBtn.style.display = state.isLoggedIn || state.isAdmin ? 'none' : 'block';
+      elements.logo.classList.add('hidden');
+    }
+    if (elements.gallery.style.display === 'grid') elements.uploadBtnHeader.style.display = 'block';
+  }
 
   function showTab(tabName) {
     document.querySelectorAll('.tabContent').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tabBtn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`${tabName}Tab`).classList.add('active');
     document.getElementById(`${tabName}TabBtn`).classList.add('active');
-    if (tabName === 'signup') signupUsername.focus();
-    if (tabName === 'login') loginUsername.focus();
-    if (tabName === 'admin') adminPassword.focus();
+    document.getElementById(`${tabName}TabBtn`).setAttribute('aria-selected', 'true');
+    document.querySelectorAll('.tabBtn').forEach(btn => {
+      if (btn.id !== `${tabName}TabBtn`) btn.setAttribute('aria-selected', 'false');
+    });
+    elements[`${tabName}Username`]?.focus() || elements.adminPassword.focus();
   }
 
-  signupSubmitBtn.addEventListener('click', () => {
-    const username = signupUsername.value.trim();
-    const password = signupPassword.value.trim();
-    if (!username || !password) {
-      showMessage('Please enter both username and password.');
-      return;
+  elements.signupSubmitBtn.addEventListener('click', () => {
+    const username = elements.signupUsername.value.trim();
+    const password = elements.signupPassword.value.trim();
+    if (!username || !password) return showMessage('Please enter both username and password.');
+    const users = getJSON('users', []);
+    if (users.some(user => user.username === username) || username === 'admin') {
+      return showMessage('Username already exists. Please choose another.');
     }
-
-    let users = JSON.parse(localStorage.getItem('users')) || [];
-    if (users.some(user => user.username === username)) {
-      showMessage('Username already exists. Please choose another.');
-      return;
-    }
-
-    users.push({ username, password });
-    localStorage.setItem('users', JSON.stringify(users));
+    users.push({ username, password, profilePicture: '', friends: [], friendRequests: [] });
+    setJSON('users', users);
     showMessage('Sign up successful! Please log in.');
     showTab('login');
-    signupUsername.value = '';
-    signupPassword.value = '';
+    elements.signupUsername.value = '';
+    elements.signupPassword.value = '';
   });
 
-  loginSubmitBtn.addEventListener('click', () => {
-    const username = loginUsername.value.trim();
-    const password = loginPassword.value.trim();
-    if (!username || !password) {
-      showMessage('Please enter both username and password.');
-      return;
-    }
-
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+  elements.loginSubmitBtn.addEventListener('click', () => {
+    const username = elements.loginUsername.value.trim();
+    const password = elements.loginPassword.value.trim();
+    if (!username || !password) return showMessage('Please enter both username and password.');
+    const users = getJSON('users', []);
     const user = users.find(user => user.username === username && user.password === password);
-    if (!user) {
-      showMessage('Invalid username or password.');
-      return;
-    }
-
-    isLoggedIn = true;
-    isAdmin = false;
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('isAdmin', 'false');
-    updateMenuVisibility();
-    signupLoginModal.classList.remove('show');
+    if (!user) return showMessage('Invalid username or password.');
+    user.friends = user.friends || [];
+    user.friendRequests = user.friendRequests || [];
+    setJSON('users', users);
+    login(username, false);
+    elements.signupLoginModal.classList.remove('show');
     showMessage('Login successful!');
-    // Refresh gallery to hide delete buttons for non-admins
-    if (gallery.style.display === 'grid') {
-      gallery.innerHTML = '';
-      uploadedImages.forEach(image => {
-        addImageToGallery(image.url, image.name);
-      });
-    }
+    updateFriendRequests();
   });
 
-  adminSubmitBtn.addEventListener('click', () => {
-    if (adminPassword.value === 'b3d5ec73f3b82d3db73f') {
-      isLoggedIn = true;
-      isAdmin = true;
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('isAdmin', 'true');
-      updateMenuVisibility();
-      signupLoginModal.classList.remove('show');
+  elements.adminSubmitBtn.addEventListener('click', () => {
+    if (elements.adminPassword.value === 'b3d5ec73f3b82d3db73f') {
+      login('admin', true);
+      elements.signupLoginModal.classList.remove('show');
       showMessage('Welcome Admin!');
-      // Refresh gallery to show delete buttons for admins
-      if (gallery.style.display === 'grid') {
-        gallery.innerHTML = '';
-        uploadedImages.forEach(image => {
-          addImageToGallery(image.url, image.name);
-        });
-      }
     } else {
       showMessage('Access denied: Invalid admin code.');
     }
   });
 
-  disconnectBtn.addEventListener('click', () => {
-    disconnectModal.classList.add('show');
-    hamburgerBtn.setAttribute('aria-expanded', 'false');
-    hamburgerBtn.classList.remove('active');
-    menu.classList.remove('show');
+  function login(username, isAdmin) {
+    state.isLoggedIn = true;
+    state.isAdmin = isAdmin;
+    state.currentUsername = username;
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('isAdmin', isAdmin);
+    localStorage.setItem('currentUsername', username);
+    updateMenuVisibility();
+  }
+
+  elements.disconnectBtn.addEventListener('click', () => {
+    elements.disconnectModal.classList.add('show');
+    elements.hamburgerBtn.setAttribute('aria-expanded', 'false');
+    elements.hamburgerBtn.classList.remove('active');
+    elements.menu.classList.remove('show');
   });
 
-  disconnectConfirmBtn.addEventListener('click', () => {
-    isLoggedIn = false;
-    isAdmin = false;
-    localStorage.setItem('isLoggedIn', 'false');
-    localStorage.setItem('isAdmin', 'false');
-    disconnectBtn.style.display = 'none';
-    disconnectModal.classList.remove('show');
+  elements.disconnectConfirmBtn.addEventListener('click', () => {
+    logout();
+    elements.disconnectModal.classList.remove('show');
     updateMenuVisibility();
-    if (welcomeSection.style.display === 'flex') {
-      signupLoginBtn.style.display = 'block';
-    }
     showSection('home');
     showMessage('Disconnected successfully.');
-    // Refresh gallery to hide delete buttons after disconnect
-    if (gallery.style.display === 'grid') {
-      gallery.innerHTML = '';
-      uploadedImages.forEach(image => {
-        addImageToGallery(image.url, image.name);
-      });
-    }
+    stopChatPolling();
   });
 
-  disconnectCancelBtn.addEventListener('click', () => {
-    disconnectModal.classList.remove('show');
+  function logout() {
+    state.isLoggedIn = false;
+    state.isAdmin = false;
+    state.currentUsername = '';
+    localStorage.setItem('isLoggedIn', 'false');
+    localStorage.setItem('isAdmin', 'false');
+    localStorage.setItem('currentUsername', '');
+  }
+
+  elements.disconnectCancelBtn.addEventListener('click', () => {
+    elements.disconnectModal.classList.remove('show');
   });
 
-  messageCloseBtn.addEventListener('click', () => {
-    messageModal.classList.remove('show');
+  elements.messageCloseBtn.addEventListener('click', () => {
+    elements.messageModal.classList.remove('show');
   });
 
   function showMessage(text) {
-    messageText.textContent = text;
-    messageModal.classList.add('show');
-    setTimeout(() => {
-      messageModal.classList.remove('show');
-    }, 3000);
+    elements.messageText.textContent = text;
+    elements.messageModal.classList.add('show');
+    setTimeout(() => elements.messageModal.classList.remove('show'), 3000);
   }
 
-  [signupLoginModal, messageModal, previewModal, disconnectModal].forEach(modal => {
-    modal.addEventListener('click', (e) => {
+  Object.values(elements.modals).forEach(modal => {
+    modal.addEventListener('click', e => {
       if (e.target === modal) {
         modal.classList.remove('show');
-        if (welcomeSection.style.display === 'flex') {
-          signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
-          logo.classList.add('hidden');
+        if (elements.welcomeSection.style.display === 'flex') {
+          elements.signupLoginBtn.style.display = state.isLoggedIn || state.isAdmin ? 'none' : 'block';
+          elements.logo.classList.add('hidden');
         }
-        if (gallery.style.display === 'grid') {
-          uploadBtnHeader.style.display = 'block';
-        }
+        if (elements.gallery.style.display === 'grid') elements.uploadBtnHeader.style.display = 'block';
       }
     });
   });
 
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      [signupLoginModal, messageModal, previewModal, disconnectModal].forEach(modal => {
-        modal.classList.remove('show');
+      Object.values(elements.modals).forEach(modal => {
+        if (modal) modal.classList.remove('show');
       });
-      if (menu.classList.contains('show')) {
-        menu.classList.remove('show');
-        hamburgerBtn.classList.remove('active');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      if (elements.menu.classList.contains('show')) {
+        elements.menu.classList.remove('show');
+        elements.hamburgerBtn.classList.remove('active');
+        elements.hamburgerBtn.setAttribute('aria-expanded', 'false');
       }
-      if (welcomeSection.style.display === 'flex') {
-        signupLoginBtn.style.display = isLoggedIn || isAdmin ? 'none' : 'block';
-        logo.classList.add('hidden');
+      if (elements.welcomeSection.style.display === 'flex') {
+        elements.signupLoginBtn.style.display = state.isLoggedIn || state.isAdmin ? 'none' : 'block';
+        elements.logo.classList.add('hidden');
       }
-      if (gallery.style.display === 'grid') {
-        uploadBtnHeader.style.display = 'block';
-      }
+      if (elements.gallery.style.display === 'grid') elements.uploadBtnHeader.style.display = 'block';
     }
   });
 
-  const symbolMap = {
-    'A': '∣', 'B': '‒', 'C': 'ˁ', 'D': '●', 'E': '⋋', 'F': '⋌', 'G': '≺', 'H': '⋏', 'I': '≖', 'J': '≻',
-    'K': '⊼', 'L': '∦', 'M': '⋂', 'N': '⋃', 'O': '∅', 'P': '∸', 'Q': '∀', 'R': '∈', 'S': '∼', 'T': 'T',
-    'U': '∃', 'V': '⋎', 'W': 'w', 'X': 'X', 'Y': 'Y', 'Z': 'Ω'
-  };
+  elements.profilePictureBtn.addEventListener('click', () => {
+    elements.profilePictureInput.click();
+  });
 
-  const reverseSymbolMap = {};
-  for (const [key, value] of Object.entries(symbolMap)) {
-    reverseSymbolMap[value] = key;
-  }
-  reverseSymbolMap['ω'] = 'W';
-  reverseSymbolMap['Ω'] = 'Z';
+  elements.profilePictureInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showMessage('Profile picture exceeds 5MB limit.');
+      elements.profilePictureInput.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = event => {
+      elements.profilePicturePreview.src = event.target.result;
+      elements.profilePictureInput.value = '';
+    };
+    reader.onerror = () => {
+      showMessage('Failed to upload profile picture.');
+      elements.profilePictureInput.value = '';
+    };
+    reader.readAsDataURL(file);
+  });
 
-  let conversionType = 'alphabetToSymbol';
+  elements.profileSaveBtn.addEventListener('click', saveProfile);
 
-  function toggleConversion() {
-    conversionType = conversionType === 'alphabetToSymbol' ? 'symbolToAlphabet' : 'alphabetToSymbol';
-    const toggleButton = document.getElementById('toggleButton');
-    toggleButton.textContent = conversionType === 'alphabetToSymbol' 
-      ? 'Alphabet → Numora' 
-      : 'Numora → Alphabet';
-    convertText();
-  }
-
-  function convertText() {
-    const inputText = document.getElementById('inputText').value.toUpperCase();
-    let outputText = '';
-
-    if (conversionType === 'alphabetToSymbol') {
-      for (let char of inputText) {
-        const symbol = symbolMap[char] || char;
-        outputText += symbol;
+  function saveProfile() {
+    if (state.isAdmin) return showMessage('Admin accounts cannot modify profile details.');
+    const newUsername = elements.profileUsername.value.trim();
+    const newPassword = elements.profilePassword.value.trim();
+    const confirmPassword = elements.profileConfirmPassword.value.trim();
+    const profilePicture = elements.profilePicturePreview.src;
+    const users = getJSON('users', []);
+    const userIndex = users.findIndex(user => user.username === state.currentUsername);
+    if (userIndex === -1) return showMessage('User not found.');
+    if (newUsername && newUsername !== state.currentUsername) {
+      if (users.some(user => user.username === newUsername) || newUsername === 'admin') {
+        return showMessage('Username already exists. Please choose another.');
       }
-    } else {
-      for (let char of inputText) {
-        const letter = reverseSymbolMap[char] || char;
-        outputText += letter;
+      users[userIndex].username = newUsername;
+      updateFriendData(state.currentUsername, newUsername);
+      state.currentUsername = newUsername;
+      localStorage.setItem('currentUsername', newUsername);
+    }
+    if (newPassword) {
+      if (newPassword !== confirmPassword) return showMessage('Passwords do not match.');
+      users[userIndex].password = newPassword;
+    }
+    if (profilePicture) users[userIndex].profilePicture = profilePicture;
+    setJSON('users', users);
+    showMessage('Profile updated successfully!');
+    loadProfileData();
+  }
+
+  function updateFriendData(oldUsername, newUsername) {
+    const users = getJSON('users', []);
+    users.forEach(user => {
+      if (user.friends?.includes(oldUsername)) {
+        user.friends = user.friends.map(f => f === oldUsername ? newUsername : f);
+      }
+      if (user.friendRequests?.some(req => req.from === oldUsername)) {
+        user.friendRequests = user.friendRequests.map(req => req.from === oldUsername ? { ...req, from: newUsername } : req);
+      }
+    });
+    const messages = getJSON('messages', {});
+    for (let chatId in messages) {
+      if (chatId.includes(oldUsername)) {
+        const newChatId = chatId.replace(oldUsername, newUsername);
+        messages[newChatId] = messages[chatId].map(msg => ({
+          ...msg,
+          sender: msg.sender === oldUsername ? newUsername : msg.sender
+        }));
+        delete messages[chatId];
       }
     }
+    setJSON('users', users);
+    setJSON('messages', messages);
+  }
 
-    document.getElementById('outputText').innerText = outputText;
+  elements.profileCancelBtn.addEventListener('click', () => showSection('home'));
+
+  elements.searchInput.addEventListener('input', handleSearch);
+
+  function handleSearch() {
+    const query = elements.searchInput.value.trim().toLowerCase();
+    elements.searchResults.innerHTML = '';
+    if (!query) return;
+    const users = getJSON('users', []);
+    const currentUser = users.find(u => u.username === state.currentUsername);
+    if (!currentUser) {
+      showMessage('User data not found. Please log in again.');
+      return logout();
+    }
+    const filteredUsers = users.filter(user => 
+      user.username.toLowerCase().includes(query) && 
+      user.username !== state.currentUsername && 
+      user.username !== 'admin' &&
+      !currentUser.friends.includes(user.username) &&
+      !currentUser.friendRequests.some(req => req.from === user.username)
+    );
+    filteredUsers.forEach(user => {
+      const resultDiv = document.createElement('div');
+      resultDiv.classList.add('search-result');
+      resultDiv.innerHTML = `<span>${user.username}</span>`;
+      const addBtn = document.createElement('button');
+      addBtn.textContent = 'Add Friend';
+      addBtn.setAttribute('aria-label', `Send friend request to ${user.username}`);
+      addBtn.addEventListener('click', () => sendFriendRequest(user.username, resultDiv));
+      resultDiv.appendChild(addBtn);
+      elements.searchResults.appendChild(resultDiv);
+    });
+  }
+
+  function sendFriendRequest(username, resultDiv) {
+    const users = getJSON('users', []);
+    const targetUser = users.find(u => u.username === username);
+    if (!targetUser) return showMessage('User not found.');
+    if (targetUser.friendRequests.some(req => req.from === state.currentUsername)) {
+      return showMessage('Friend request already sent.');
+    }
+    targetUser.friendRequests = targetUser.friendRequests || [];
+    targetUser.friendRequests.push({ from: state.currentUsername, date: new Date().toISOString() });
+    setJSON('users', users);
+    showMessage(`Friend request sent to ${username}!`);
+    resultDiv.remove();
+  }
+
+  function updateFriendRequests() {
+    elements.friendRequests.innerHTML = '';
+    const users = getJSON('users', []);
+    const currentUser = users.find(u => u.username === state.currentUsername);
+    if (!currentUser) {
+      showMessage('User data not found. Please log in again.');
+      return logout();
+    }
+    currentUser.friendRequests = currentUser.friendRequests || [];
+    currentUser.friendRequests.forEach(req => {
+      const reqDiv = document.createElement('div');
+      reqDiv.classList.add('search-result');
+      reqDiv.innerHTML = `<span>From: ${req.from}</span>`;
+      const viewBtn = document.createElement('button');
+      viewBtn.textContent = 'View';
+      viewBtn.setAttribute('aria-label', `View friend request from ${req.from}`);
+      viewBtn.addEventListener('click', () => showFriendRequest(req));
+      reqDiv.appendChild(viewBtn);
+      elements.friendRequests.appendChild(reqDiv);
+    });
+  }
+
+  function showFriendRequest(req) {
+    elements.friendRequestText.textContent = `${req.from} wants to be your friend.`;
+    elements.friendRequestModal.classList.add('show');
+    elements.acceptFriendBtn.onclick = () => acceptFriendRequest(req);
+    elements.declineFriendBtn.onclick = () => declineFriendRequest(req);
+  }
+
+  function acceptFriendRequest(req) {
+    const users = getJSON('users', []);
+    const sender = users.find(u => u.username === req.from);
+    const receiver = users.find(u => u.username === state.currentUsername);
+    if (!sender || !receiver) {
+      showMessage('User data not found.');
+      elements.friendRequestModal.classList.remove('show');
+      return;
+    }
+    receiver.friendRequests = receiver.friendRequests.filter(r => r.from !== req.from);
+    receiver.friends = receiver.friends || [];
+    sender.friends = sender.friends || [];
+    receiver.friends.push(req.from);
+    sender.friends.push(state.currentUsername);
+    setJSON('users', users);
+    elements.friendRequestModal.classList.remove('show');
+    showMessage(`You are now friends with ${req.from}!`);
+    updateFriendRequests();
+    updateFriendList();
+  }
+
+  function declineFriendRequest(req) {
+    const users = getJSON('users', []);
+    const receiver = users.find(u => u.username === state.currentUsername);
+    if (!receiver) {
+      showMessage('User data not found.');
+      elements.friendRequestModal.classList.remove('show');
+      return;
+    }
+    receiver.friendRequests = receiver.friendRequests.filter(r => r.from !== req.from);
+    setJSON('users', users);
+    elements.friendRequestModal.classList.remove('show');
+    showMessage(`Declined friend request from ${req.from}.`);
+    updateFriendRequests();
+  }
+
+  elements.friendRequestCloseBtn.addEventListener('click', () => {
+    elements.friendRequestModal.classList.remove('show');
+  });
+
+  function updateFriendList() {
+    elements.friendList.innerHTML = '';
+    const users = getJSON('users', []);
+    const currentUser = users.find(u => u.username === state.currentUsername);
+    if (!currentUser) {
+      showMessage('User data not found. Please log in again.');
+      return logout();
+    }
+    currentUser.friends = currentUser.friends || [];
+    if (currentUser.friends.length === 0) {
+      elements.friendList.innerHTML = '<p>No friends yet. Search for users to add friends!</p>';
+      return;
+    }
+    currentUser.friends.forEach(friend => {
+      const friendDiv = document.createElement('div');
+      friendDiv.classList.add('friend-item');
+      friendDiv.innerHTML = `<span>${friend}</span>`;
+      const chatBtn = document.createElement('button');
+      chatBtn.textContent = 'Chat';
+      chatBtn.setAttribute('aria-label', `Start chat with ${friend}`);
+      chatBtn.addEventListener('click', () => {
+        state.currentChatFriend = friend;
+        elements.chatFriendName.textContent = `Chat with ${friend}`;
+        elements.removeFriendBtn.style.display = 'inline-block';
+        loadChatMessages();
+        showSection('chat');
+        startChatPolling();
+        elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+      });
+      friendDiv.appendChild(chatBtn);
+      elements.friendList.appendChild(friendDiv);
+    });
+  }
+
+  function startChatPolling() {
+    if (state.pollingInterval) return;
+    state.pollingInterval = setInterval(() => {
+      if (!state.currentChatFriend) return;
+      const messages = getJSON('messages', {});
+      const chatId = [state.currentUsername, state.currentChatFriend].sort().join('_');
+      const currentMessages = messages[chatId] || [];
+      if (state.lastMessageCount !== null && currentMessages.length !== state.lastMessageCount) {
+        loadChatMessages();
+        elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+      }
+      state.lastMessageCount = currentMessages.length;
+    }, 2000);
+  }
+
+  function stopChatPolling() {
+    if (state.pollingInterval) {
+      clearInterval(state.pollingInterval);
+      state.pollingInterval = null;
+      state.lastMessageCount = null;
+    }
+  }
+
+  function loadChatMessages() {
+    if (!state.currentChatFriend) {
+      elements.chatMessages.innerHTML = '<p>No friend selected.</p>';
+      return;
+    }
+    elements.chatMessages.innerHTML = '';
+    const messages = getJSON('messages', {});
+    const chatId = [state.currentUsername, state.currentChatFriend].sort().join('_');
+    const chat = messages[chatId] || [];
+    chat.forEach(msg => {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('chat-message');
+      const sender = document.createElement('p');
+      sender.textContent = `${msg.sender}:`;
+      msgDiv.appendChild(sender);
+      const content = document.createElement('p');
+      content.textContent = msg.content;
+      msgDiv.appendChild(content);
+      const convertBtn = document.createElement('button');
+      convertBtn.textContent = 'Convert';
+      convertBtn.setAttribute('aria-label', 'Convert message to Numora/Alphabet');
+      convertBtn.addEventListener('click', () => {
+        const isNumora = Object.values(numoraAlphabet).some(symbol => msg.content.includes(symbol));
+        const converted = isNumora ? numoraToAlphabet(msg.content) : alphabetToNumora(msg.content);
+        showMessage(`Converted: ${converted}`);
+      });
+      msgDiv.appendChild(convertBtn);
+      const time = document.createElement('p');
+      time.style.fontSize = '0.8em';
+      time.style.color = '#ccc';
+      time.textContent = new Date(msg.timestamp).toLocaleTimeString();
+      msgDiv.appendChild(time);
+      elements.chatMessages.appendChild(msgDiv);
+    });
+    state.lastMessageCount = chat.length;
+  }
+
+  elements.sendMessageBtn.addEventListener('click', sendMessage);
+
+  function sendMessage() {
+    if (!state.currentChatFriend) return showMessage('Please select a friend to chat with.');
+    let messageContent = elements.chatInput.value.trim();
+    if (!messageContent) return;
+    if (state.isNumoraMode) {
+      messageContent = alphabetToNumora(messageContent);
+      if (!messageContent) return showMessage('No valid letters to convert to Numora.');
+    }
+    const messages = getJSON('messages', {});
+    const chatId = [state.currentUsername, state.currentChatFriend].sort().join('_');
+    messages[chatId] = messages[chatId] || [];
+    messages[chatId].push({
+      sender: state.currentUsername,
+      content: messageContent,
+      type: 'text',
+      timestamp: new Date().toISOString()
+    });
+    setJSON('messages', messages);
+    elements.chatInput.value = '';
+    loadChatMessages();
+    elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+  }
+
+  elements.toggleNumoraBtn.addEventListener('click', () => {
+    state.isNumoraMode = !state.isNumoraMode;
+    elements.toggleNumoraBtn.textContent = state.isNumoraMode ? 'Numora' : 'Normal';
+  });
+
+  elements.backToFriendsBtn.addEventListener('click', () => {
+    stopChatPolling();
+    state.currentChatFriend = '';
+    elements.chatFriendName.textContent = '';
+    elements.removeFriendBtn.style.display = 'none';
+    showSection('friendList');
+  });
+
+  elements.removeFriendBtn.addEventListener('click', () => {
+    if (!state.currentChatFriend) return;
+    const users = getJSON('users', []);
+    const currentUser = users.find(u => u.username === state.currentUsername);
+    const friend = users.find(u => u.username === state.currentChatFriend);
+    if (!currentUser || !friend) {
+      showMessage('User data not found.');
+      return;
+    }
+    currentUser.friends = currentUser.friends.filter(f => f !== state.currentChatFriend);
+    friend.friends = friend.friends.filter(f => f !== state.currentUsername);
+    const messages = getJSON('messages', {});
+    const chatId = [state.currentUsername, state.currentChatFriend].sort().join('_');
+    delete messages[chatId];
+    setJSON('users', users);
+    setJSON('messages', messages);
+    showMessage(`Removed ${state.currentChatFriend} as a friend.`);
+    stopChatPolling();
+    state.currentChatFriend = '';
+    elements.chatFriendName.textContent = '';
+    elements.removeFriendBtn.style.display = 'none';
+    showSection('friendList');
+  });
+
+  function alphabetToNumora(text) {
+    return text.toLowerCase()
+      .split('')
+      .filter(c => /[a-z]/.test(c))
+      .map(c => numoraAlphabet[c] || '')
+      .join('') || '';
+  }
+
+  function numoraToAlphabet(text) {
+    return text.split('')
+      .map(c => reverseNumora[c] || '')
+      .filter(c => c)
+      .join('') || 'Invalid Numora input';
+  }
+
+  // Numora Converter Functions
+  function clearText() {
+    elements.inputText.value = '';
+    elements.outputText.textContent = '';
+  }
+
+  function toggleConversion() {
+    const isNumoraToAlphabet = elements.toggleButton.textContent === 'Numora → Alphabet';
+    elements.toggleButton.textContent = isNumoraToAlphabet ? 'Alphabet → Numora' : 'Numora → Alphabet';
+    convertText(elements.inputText.value.trim());
+  }
+
+  function convertText(input) {
+    const isNumoraToAlphabet = elements.toggleButton.textContent === 'Numora → Alphabet';
+    if (!input) {
+      elements.outputText.textContent = '';
+      return;
+    }
+    try {
+      if (isNumoraToAlphabet) {
+        elements.outputText.textContent = numoraToAlphabet(input) || 'Invalid Numora input';
+      } else {
+        const result = alphabetToNumora(input);
+        elements.outputText.textContent = result || 'No valid letters found';
+      }
+    } catch {
+      elements.outputText.textContent = 'Error during conversion';
+    }
   }
 
   function copyOutput() {
-    const outputText = document.getElementById('outputText').innerText;
-    if (outputText) {
-      navigator.clipboard.writeText(outputText).then(() => {
-        showMessage('Converted text copied to clipboard!');
-      }).catch(() => {
-        showMessage('Failed to copy text.');
-      });
-    } else {
-      showMessage('No converted text to copy.');
+    const text = elements.outputText.textContent;
+    if (!text) return showMessage('Nothing to copy.');
+    navigator.clipboard.writeText(text)
+      .then(() => showMessage('Copied to clipboard!'))
+      .catch(() => showMessage('Failed to copy.'));
+  }
+
+  elements.inputText.addEventListener('input', e => convertText(e.target.value.trim()));
+
+  // Utility functions
+  function getJSON(key, defaultValue) {
+    try {
+      return JSON.parse(localStorage.getItem(key)) || defaultValue;
+    } catch {
+      return defaultValue;
     }
   }
 
-  function clearText() {
-    document.getElementById('inputText').value = '';
-    document.getElementById('outputText').innerText = '';
+  function setJSON(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      showMessage(`Error saving ${key}. Storage may be full.`);
+    }
   }
-
-  document.getElementById('inputText').addEventListener('input', convertText);
 </script>
 </body>
 </html>
